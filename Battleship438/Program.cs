@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Game3
+namespace Battleship438
 {
 #if WINDOWS || LINUX
     /// <summary>
@@ -14,7 +14,7 @@ namespace Game3
         [STAThread]
         static void Main()
         {
-            using (var game = new Game1())
+            using (var game = new BattleshipGame())
                 game.Run();
         }
     }
