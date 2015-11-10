@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Battleship438
@@ -33,19 +32,13 @@ namespace Battleship438
           public void Initialize(Texture2D texture, Vector2 position)
           {
                PlayerTexture = texture;
-
                Position = position;
-
                Active = true;
-
                Health = 100;
-
-
           }
 
           public void Update()
           {
-
           }
 
           public void Draw(SpriteBatch spriteBatch)
