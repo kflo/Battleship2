@@ -1,14 +1,13 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-/// Player has its own _PlayerGrid, and can see an _EnemyGrid, it can also check if
-/// all ships are deployed and if all ships are detroyed. A Player can also attach.
-/// 
+
 namespace Battleship438
 {
-     public class Player2 : IEnumerable<Ship>
+     class Player : IEnumerable<Ship>
      {
-
           protected static Random _Random = new Random();
           private static Dictionary<ShipName, Ship> _Ships = new Dictionary<ShipName, Ship>();
           private SeaGrid _playerGrid = new SeaGrid(_Ships);
@@ -35,7 +34,7 @@ namespace Battleship438
                set { _enemyGrid = value; }
           }
 
-          public Player2(BattleshipGame controller)
+          public Player(BattleshipGame controller)
           {
                _game = controller;
 
@@ -81,9 +80,10 @@ namespace Battleship438
           /// <value>The ship</value>
           /// <returns>The ship with the indicated name</returns>
           /// <remarks>The none ship returns nothing/null</remarks>
-          public Ship Ship(ShipName name) {
+          public Ship Ship(ShipName name)
+          {
                if (name == ShipName.None)
-                         return null;
+                    return null;
                return _Ships[name];
           }
 
@@ -231,6 +231,18 @@ namespace Battleship438
                          }
                     } while (!placementSuccessful);
                }
+          }
+
+          public void Initialize(Texture2D texture, Vector2 position) {
+               PlayerTexture = texture;
+               Position = position;
+          }
+
+          public void Update() {
+          }
+
+          public void Draw(SpriteBatch spriteBatch) {
+               spriteBatch.Draw(PlayerTexture, Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
           }
      }
 }

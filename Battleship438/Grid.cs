@@ -24,27 +24,25 @@ namespace Battleship438
                {
                     for (int j = 0; j <= height - 1; j++)
                     {
-                         if (grid[i, j].Ship == null)
-                         {
                               grid[i, j] = new Tile(i, j, null);
-                              grid[i, j].texture = texture;
-                         }
+                              grid[i, j].Texture = texture;
                     }
                }
           }
+
 
           public void Draw(SpriteBatch spriteBatch)
           {  /// this PLAYER's grid, at position "playerGrid"
                for (int i = 0; i <= grid.GetUpperBound(0); i++) {
                     for (int j = 0; j <= grid.GetUpperBound(1); j++) {
                               Vector2 texturePosition = new Vector2(i * (tileSize -2), j * (tileSize -2)) + playerGrid;
-                              spriteBatch.Draw(grid[i, j].texture, texturePosition, null, Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+                              spriteBatch.Draw(grid[i, j].Texture, texturePosition, null, Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
                     }
                } /// the enemy's grid, at position "enemyGrid"
                for (int i = 0; i <= grid.GetUpperBound(0); i++) {
                     for (int j = 0; j <= grid.GetUpperBound(1); j++) {
                               Vector2 texturePosition = new Vector2(i * (tileSize - 2), j * (tileSize - 2)) + enemyGrid;
-                              spriteBatch.Draw(grid[i, j].texture, texturePosition, null, Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+                              spriteBatch.Draw(grid[i, j].Texture, texturePosition, null, Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
                     }
                }
           }

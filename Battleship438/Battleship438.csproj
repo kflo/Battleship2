@@ -58,7 +58,7 @@
     <Compile Include="Direction.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="ISeaGrid.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="MoveableShip.cs" />
     <Compile Include="Player2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,7 +79,26 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="battleship438.ico" />
+    <Content Include="Content\Graphics\background.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Graphics\cursor50.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Graphics\earth.png" />
+    <Content Include="Content\Graphics\gridTex.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Graphics\gridTexRed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Graphics\gridTexWater.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Graphics\miniBS.png" />
+    <Content Include="Content\Graphics\newGame.png" />
+    <Content Include="Content\Graphics\ship1.png" />
+    <Content Include="Content\Graphics\ship2.png" />
     <Content Include="Content\Graphics\shuttle.png" />
     <Content Include="Content\Graphics\stars.jpg" />
   </ItemGroup>
@@ -91,6 +110,9 @@
     <Content Include="Content\Graphics\player.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Content\Fonts\myFont.spritefont">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
