@@ -15,7 +15,7 @@ namespace Battleship438
           const int height = 10;
           Tile[,] grid = new Tile[width, height];
           
-
+          /*
           //adds TILES into the underlying grid array
           public void Initialize(Texture2D texture)
           {
@@ -29,7 +29,7 @@ namespace Battleship438
                     }
                }
           }
-
+          */
 
           public void Draw(SpriteBatch spriteBatch)
           {  /// this PLAYER's grid, at position "playerGrid"

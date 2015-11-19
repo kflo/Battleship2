@@ -4,18 +4,33 @@ using System;
 
 
 /// Tile knows its location on the grid, if it is a ship and if it has been shot before
-public class Tile : Battleship438.BattleshipGame
+public class Tile
 {
+     private Rectangle rect;
      //the row value of the tile
      private readonly int _RowValue;
      //the column value of the tile
      private readonly int _ColumnValue;
      //the ship the tile belongs to
-     private Ship _Ship = null;
+     private Ship _Ship;
      //the tile has been shot at
      private bool _Shot = false;
      private bool shipBool = false;
      private Texture2D texture;
+
+     /// The tile constructor will know where it is on the grid, and is its a ship
+     /// <param name="row">the row on the grid</param>
+     /// <param name="col">the col on the grid</param>
+     /// <param name="ship">what ship it is</param>
+     public Tile(int row, int col, Ship ship, Texture2D tex)
+     {
+          _RowValue = row;
+          _ColumnValue = col;
+          _Ship = ship;
+          Texture = tex;
+          rect = new Rectangle(0, 0, Texture.Width, Texture.Height);
+     }
+     
 
      /// Has the tile been shot?
      /// <value>indicate if the tile has been shot</value>
@@ -63,16 +78,7 @@ public class Tile : Battleship438.BattleshipGame
           }
      }
 
-     /// The tile constructor will know where it is on the grid, and is its a ship
-     /// <param name="row">the row on the grid</param>
-     /// <param name="col">the col on the grid</param>
-     /// <param name="ship">what ship it is</param>
-     public Tile(int row, int col, Ship ship) {
-          _RowValue = row;
-          _ColumnValue = col;
-          _Ship = ship;
-     }
-
+     
      /// Clearship will remove the ship from the tile
      public void ClearShip() {
           _Ship = null;

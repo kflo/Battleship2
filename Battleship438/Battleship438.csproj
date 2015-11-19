@@ -59,7 +59,7 @@
     <Compile Include="Grid.cs" />
     <Compile Include="ISeaGrid.cs" />
     <Compile Include="MoveableShip.cs" />
-    <Compile Include="Player2.cs" />
+    <Compile Include="PB1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultOfAttack.cs" />
@@ -70,6 +70,7 @@
     <Compile Include="TileView.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Lidgren.Network, Version=3.5.0.793, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
@@ -96,7 +97,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Graphics\miniBS.png" />
-    <Content Include="Content\Graphics\newGame.png" />
+    <Content Include="Content\Graphics\newGame.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Graphics\randomize.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Graphics\ship1.png" />
     <Content Include="Content\Graphics\ship2.png" />
     <Content Include="Content\Graphics\shuttle.png" />
@@ -110,7 +116,16 @@
     <Content Include="Content\Graphics\player.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Content\Fonts\myFont.spritefont">
+    <None Include="Content\Fonts\motorOil.spritefont">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\Fonts\myFontH2.spritefont">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\Fonts\myFontH1.spritefont">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\Fonts\myFontBody.spritefont">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

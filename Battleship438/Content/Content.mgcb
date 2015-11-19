@@ -97,12 +97,6 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/gridTex.png
 
-#begin Fonts/myFont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:Fonts/myFont.spritefont
-
 #begin Graphics/background.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -174,4 +168,28 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/cursor50.png
+
+#begin Fonts/myFontBody.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/myFontBody.spritefont
+
+#begin Fonts/myFontH1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/myFontH1.spritefont
+
+#begin Fonts/myFontH2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/myFontH2.spritefont
+
+#begin Fonts/motorOil.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/motorOil.spritefont
 

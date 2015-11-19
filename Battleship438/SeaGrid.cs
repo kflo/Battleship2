@@ -12,24 +12,24 @@ namespace Battleship438
 {
      public class SeaGrid : ISeaGrid
      {
-          Random rand = new Random();
+          private Random rand;
           int tileSize = 30;
           
           private const int _WIDTH = 10;
           private const int _HEIGHT = 10;
-          private Tile[,] _GameTiles = new Tile[_WIDTH, _HEIGHT];
+          private Tile[,] _GameTiles;
           private Dictionary<ShipName, Ship> _shipList;
           private int _ShipsKilled = 0;
 
 
           /// SeaGrid constructor, a seagrid has a number of tiles stored in an array
-          public SeaGrid(Dictionary<ShipName, Ship> ships)
+          public SeaGrid(Dictionary<ShipName, Ship> ships, Texture2D tex)
           {
+               _GameTiles = new Tile[_WIDTH, _HEIGHT];
                //fill array with empty Tiles
-               int i = 0;
-               for (i = 0; i <= _WIDTH - 1; i++) {
+               for (int i = 0; i <= _WIDTH - 1; i++) {
                     for (int j = 0; j <= _HEIGHT - 1; j++) {
-                         _GameTiles[i, j] = new Tile(i, j, null);
+                         _GameTiles[i, j] = new Tile(i, j, null, tex);
                     }
                }
                //ship Dictionary given set of ships to contain
@@ -56,13 +56,14 @@ namespace Battleship438
           }
 
           private void randomize(ref Direction heading, ref int row, ref int col, Ship ship) {
+               rand = new Random(System.DateTime.Now.Millisecond);
                int dir;
                int dRow;
                int dCol;
                int currRow;
                int currCol;
                bool blocked;
-               repeat:
+     repeat:
                blocked = false;
                dir = rand.Next(2);
                if (dir == 0) {
@@ -98,14 +99,15 @@ namespace Battleship438
           }
 
           /// The sea grid has changed and should be redrawn.
-          public event EventHandler Changed;
           
+          public event EventHandler Changed;
+          /*
           public void grid_Changed() {
                if (Changed != null) {
                     Changed(this, EventArgs.Empty);
                }
           }
-
+          */
           /// The width of the sea grid.
           /// <value>The width of the sea grid.</value>
           /// <returns>The width of the sea grid.</returns>
@@ -196,7 +198,7 @@ namespace Battleship438
                     throw new ApplicationException(e.Message);
                }
                finally {
-                    grid_Changed();
+                    //grid_Changed();
                }
           }
                     
@@ -230,9 +232,15 @@ namespace Battleship438
                     return new AttackResult(ResultOfAttack.Hit, "hit something!", row, col);
                }
                finally {
-                    grid_Changed();
+                    //grid_Changed();
                }
           }
+
+          public void Update()
+          {
+               if ()
+          }
+
 
           public void Draw(SpriteBatch spriteBatch, Vector2 grid)
           {  /// this PLAYER's grid, at position "playerGrid"
