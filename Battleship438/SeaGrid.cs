@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 /// The SeaGrid is the grid upon which the ships are deployed.
 /// 
@@ -10,20 +12,23 @@ namespace Battleship438
 {
      public class SeaGrid : ISeaGrid
      {
+          Random rand = new Random();
+          int tileSize = 30;
+          
           private const int _WIDTH = 10;
           private const int _HEIGHT = 10;
           private Tile[,] _GameTiles = new Tile[_WIDTH, _HEIGHT];
           private Dictionary<ShipName, Ship> _shipList;
-
           private int _ShipsKilled = 0;
+
 
           /// SeaGrid constructor, a seagrid has a number of tiles stored in an array
           public SeaGrid(Dictionary<ShipName, Ship> ships)
           {
                //fill array with empty Tiles
                int i = 0;
-               for (i = 0; i <= Width - 1; i++) {
-                    for (int j = 0; j <= Height - 1; j++) {
+               for (i = 0; i <= _WIDTH - 1; i++) {
+                    for (int j = 0; j <= _HEIGHT - 1; j++) {
                          _GameTiles[i, j] = new Tile(i, j, null);
                     }
                }
@@ -31,8 +36,75 @@ namespace Battleship438
                _shipList = ships;
           }
 
+          public void texturize(Texture2D texture) {
+               for (int i = 0; i <= _WIDTH - 1; i++) {
+                    for (int j = 0; j <= _HEIGHT - 1; j++) {
+                        _GameTiles[i, j].Texture = texture;
+                    }
+               }
+          }
+
+          /// randomly initializes the ships from the Dictionary
+          public void Initialize(Texture2D texture) {
+               Direction heading = Direction.LeftRight;
+               int row = 0;
+               int col = 0;
+               foreach (var item in _shipList) { //ITEM is the ship Dictionary pair (KEY = SHIPNAME, VALUE = SHIP)
+                    randomize(ref heading, ref row, ref col, item.Value);
+                    MoveShip(row, col, item.Key, heading, texture);
+               }
+          }
+
+          private void randomize(ref Direction heading, ref int row, ref int col, Ship ship) {
+               int dir;
+               int dRow;
+               int dCol;
+               int currRow;
+               int currCol;
+               bool blocked;
+               repeat:
+               blocked = false;
+               dir = rand.Next(2);
+               if (dir == 0) {
+                    heading = Direction.UpDown;
+                    col = rand.Next(10);
+                    row = rand.Next(6);
+               } else {
+                    heading = Direction.LeftRight;
+                    col = rand.Next(6);
+                    row = rand.Next(10);
+               }
+
+               currRow = row;
+               currCol = col;
+
+               if (heading == Direction.LeftRight) {
+                    dRow = 0;
+                    dCol = 1;
+               } else {
+                    dRow = 1;
+                    dCol = 0;
+               }
+
+               for (int j = 0; j < ship.Size; j++) {
+                    if (_GameTiles[currRow, currCol].hasShip)
+                         blocked = true;
+                    currCol += dCol;
+                    currRow += dRow;
+               }
+               
+               if (blocked) 
+                    goto repeat;
+          }
+
           /// The sea grid has changed and should be redrawn.
           public event EventHandler Changed;
+          
+          public void grid_Changed() {
+               if (Changed != null) {
+                    Changed(this, EventArgs.Empty);
+               }
+          }
 
           /// The width of the sea grid.
           /// <value>The width of the sea grid.</value>
@@ -73,30 +145,15 @@ namespace Battleship438
                }
           }
 
-          /// randomly initializes the ships from the Dictionary
-          public void Initialize()
-          {
-               Random rand = new Random();
-               int row;
-               int col;
-               foreach (var item in _shipList)
-               {
-                    row = rand.Next(10);
-                    col = rand.Next(10);
-                    MoveShip(row, col, item.Key, Direction.LeftRight);
-               }
-          }
-
-
           /// MoveShips allows for ships to be placed on the seagrid
           /// <param name="row">the row selected</param>
           /// <param name="col">the column selected</param>
           /// <param name="ship">the ship selected</param>
           /// <param name="direction">the direction the ship is going</param>
-          public void MoveShip(int row, int col, ShipName shipName, Direction direction) {
-               Ship newShip = _shipList[shipName];
-               newShip.Remove();
-               AddShip(row, col, direction, newShip);
+          public void MoveShip(int row, int col, ShipName shipName, Direction direction, Texture2D texture) {
+               Ship shipToMove = _shipList[shipName];
+               shipToMove.Remove();
+               AddShip(row, col, direction, shipToMove, texture);
           }
 
           /// AddShip add a ship to the SeaGrid
@@ -104,7 +161,7 @@ namespace Battleship438
           /// <param name="col">col coordinate</param>
           /// <param name="direction">direction of ship</param>
           /// <param name="newShip">the ship</param>
-          private void AddShip(int row, int col, Direction direction, Ship newShip) {
+          private void AddShip(int row, int col, Direction direction, Ship newShip, Texture2D texture) {
                try {
                     int size = newShip.Size;
                     int currentRow = row;
@@ -115,21 +172,21 @@ namespace Battleship438
                     if (direction == Direction.LeftRight) {
                          dRow = 0;
                          dCol = 1;
-                    }
-                    else {
+                    } else {
                          dRow = 1;
                          dCol = 0;
                     }
-
+   
                     //place ship's tiles in array and into ship object
-                    int i = 0;
-                    for (i = 0; i <= size - 1; i++) {
-                         if (currentRow < 0 | currentRow > Width | currentCol < 0 | currentCol > Height) {
+                         for (int i = 0; i < size; i++) {
+                         if (currentRow < 0 | currentRow > _WIDTH | currentCol < 0 | currentCol > _HEIGHT) {
                               throw new InvalidOperationException("Ship can't fit on the board");
                          }
                          _GameTiles[currentRow, currentCol].Ship = newShip;
+                         _GameTiles[currentRow, currentCol].Texture = texture;
                          currentCol += dCol;
                          currentRow += dRow;
+                         
                     }
                     newShip.Deployed(direction, row, col);
                }
@@ -139,10 +196,7 @@ namespace Battleship438
                     throw new ApplicationException(e.Message);
                }
                finally {
-                    if (Changed != null)
-                    {
-                         Changed(this, EventArgs.Empty);
-                    }
+                    grid_Changed();
                }
           }
                     
@@ -176,8 +230,18 @@ namespace Battleship438
                     return new AttackResult(ResultOfAttack.Hit, "hit something!", row, col);
                }
                finally {
-                    if (Changed != null) {
-                         Changed(this, EventArgs.Empty);
+                    grid_Changed();
+               }
+          }
+
+          public void Draw(SpriteBatch spriteBatch, Vector2 grid)
+          {  /// this PLAYER's grid, at position "playerGrid"
+               for (int i = 0; i <= _GameTiles.GetUpperBound(0); i++)
+               {
+                    for (int j = 0; j <= _GameTiles.GetUpperBound(1); j++)
+                    {
+                         Vector2 texturePosition = new Vector2(i * (tileSize - 2), j * (tileSize - 2)) + grid;
+                         spriteBatch.Draw(_GameTiles[i, j].Texture, texturePosition, null, Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
                     }
                }
           }
