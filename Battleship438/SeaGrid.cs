@@ -247,7 +247,7 @@ namespace Battleship438
           private void tileChanged(object sender, TileEventArgs e)
           {
                _GameTiles[e.X, e.Y].Texture = red;
-          }
+          }    
 
 
           public void Update()

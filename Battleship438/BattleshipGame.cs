@@ -21,26 +21,23 @@ namespace Battleship438
           private SeaGrid seaGrid, seaGrid2;
           private Vector2 playerGrid, enemyGrid;
 
-          // mouse states
           private MouseState currMouseState;
           private Rectangle vp;
           private string str;
 
 
-          public BattleshipGame()
-          {
+          public BattleshipGame() {
                graphics = new GraphicsDeviceManager(this);
                Content.RootDirectory = "Content";
                this.Window.AllowUserResizing = true;
-
                //graphics.IsFullScreen = true;
           }
+
 
           /// Allows the game to perform any initialization it needs to before starting to run.
           /// This is where it can query for any required services and load any non-graphic related content.  
           /// Calling base.Initialize will enumerate through any components and initialize them as well.
-          protected override void Initialize()
-          {
+          protected override void Initialize() {
                shipList = new Dictionary<ShipName, Ship>();
                shipList.Add(ShipName.AircraftCarrier, new Ship(ShipName.AircraftCarrier));
                shipList.Add(ShipName.Battleship, new Ship(ShipName.Battleship));
@@ -59,9 +56,9 @@ namespace Battleship438
                base.Initialize();
           }
 
+
           /// LoadContent will be called once per game and is the place to load all of your content.
-          protected override void LoadContent()
-          {
+          protected override void LoadContent() {
                // Create a new SpriteBatch, which can be used to draw textures.
                spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -92,15 +89,18 @@ namespace Battleship438
                seaGrid2.Changed += seaGridChanged;
           }
 
+
+
           /// UnloadContent will be called once per game and is the place to unload game-specific content.
           protected override void UnloadContent() {
                // TODO: Unload any non ContentManager content here
           }
 
+
+
           /// Allows the game to run logic such as updating the world,
           /// checking for collisions, gathering input, and playing audio.
           /// <param name="gameTime">Provides a snapshot of timing values.</param>
-           
           protected override void Update(GameTime gameTime) {
                if (Keyboard.GetState().IsKeyDown(Keys.Escape)) {
                     graphics.IsFullScreen = false;
@@ -115,6 +115,8 @@ namespace Battleship438
                base.Update(gameTime);
           }
 
+
+
           private void seaGridChanged(object sender, EventArgs e) {
                str = sender.ToString();
           }
@@ -125,8 +127,7 @@ namespace Battleship438
                seaGrid.Initialize(red);
                str = "CHANGE HAPPENED";
           }
-          private void pbcU(object sender, EventArgs e)
-          {
+          private void pbcU(object sender, EventArgs e) {
                pb1.Texture = Content.Load<Texture2D>("Graphics\\newGame");
                seaGrid2.texturize(water);
                seaGrid2.Initialize(red);
@@ -134,10 +135,10 @@ namespace Battleship438
           }
 
 
+
           /// This is called when the game should draw itself.
           /// <param name="gameTime">Provides a snapshot of timing values.</param>
-          protected override void Draw(GameTime gameTime)
-          {
+          protected override void Draw(GameTime gameTime) {
                graphics.GraphicsDevice.Clear(Color.SlateGray);
 
                

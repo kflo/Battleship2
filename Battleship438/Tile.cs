@@ -159,8 +159,9 @@ public class Tile
 
      public void Update()
      {
-          if (Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed) {
+          if (Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && Shot == false) {
                tileChanged(this, new TileEventArgs(this.Row, this.Column));
+               Shot = true;
           }
 
      }
