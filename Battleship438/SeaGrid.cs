@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 
 /// The SeaGrid is the grid upon which the ships are deployed.
@@ -14,28 +15,32 @@ namespace Battleship438
      {
           private Random rand;
           int tileSize = 30;
-          
+          private Rectangle rect, tileRect;
           private const int _WIDTH = 10;
           private const int _HEIGHT = 10;
           private Tile[,] _GameTiles;
           private Dictionary<ShipName, Ship> _shipList;
           private int _ShipsKilled = 0;
+          private Texture2D red;
 
 
           /// SeaGrid constructor, a seagrid has a number of tiles stored in an array
-          public SeaGrid(Dictionary<ShipName, Ship> ships, Texture2D tex)
+          public SeaGrid(Dictionary<ShipName, Ship> ships, Vector2 vector, Texture2D tex)
           {
+               rect = new Rectangle((int)vector.X, (int)vector.Y, tileSize * 10 - 20, tileSize * 10 - 20);
                _GameTiles = new Tile[_WIDTH, _HEIGHT];
                //fill array with empty Tiles
                for (int i = 0; i <= _WIDTH - 1; i++) {
                     for (int j = 0; j <= _HEIGHT - 1; j++) {
-                         _GameTiles[i, j] = new Tile(i, j, null, tex);
+                         tileRect = new Rectangle(i * (tileSize - 2) + rect.X, j * (tileSize - 2) + rect.Y, tex.Width, tex.Height);
+                         _GameTiles[i, j] = new Tile(i, j, null, tex, tileRect);
+                         _GameTiles[i, j].Changed += tileChanged;
                     }
                }
-               //ship Dictionary given set of ships to contain
                _shipList = ships;
           }
 
+          //set Texture of ALL tiles in seaGrid
           public void texturize(Texture2D texture) {
                for (int i = 0; i <= _WIDTH - 1; i++) {
                     for (int j = 0; j <= _HEIGHT - 1; j++) {
@@ -46,6 +51,7 @@ namespace Battleship438
 
           /// randomly initializes the ships from the Dictionary
           public void Initialize(Texture2D texture) {
+               red = texture;
                Direction heading = Direction.LeftRight;
                int row = 0;
                int col = 0;
@@ -88,8 +94,10 @@ namespace Battleship438
                }
 
                for (int j = 0; j < ship.Size; j++) {
-                    if (_GameTiles[currRow, currCol].hasShip)
+                    if (_GameTiles[currRow, currCol].hasShip) { 
                          blocked = true;
+                         break;
+                    }
                     currCol += dCol;
                     currRow += dRow;
                }
@@ -101,13 +109,13 @@ namespace Battleship438
           /// The sea grid has changed and should be redrawn.
           
           public event EventHandler Changed;
-          /*
-          public void grid_Changed() {
+          
+          private void gridChanged(object sender, EventArgs e) {
                if (Changed != null) {
-                    Changed(this, EventArgs.Empty);
+                    Changed(this, e);
                }
           }
-          */
+          
           /// The width of the sea grid.
           /// <value>The width of the sea grid.</value>
           /// <returns>The width of the sea grid.</returns>
@@ -236,20 +244,33 @@ namespace Battleship438
                }
           }
 
-          public void Update()
+          private void tileChanged(object sender, TileEventArgs e)
           {
-               if ()
+               _GameTiles[e.X, e.Y].Texture = red;
           }
 
 
-          public void Draw(SpriteBatch spriteBatch, Vector2 grid)
+          public void Update()
+          {
+               //     gridChanged(this, EventArgs.Empty);
+                    for (int i = 0; i <= _GameTiles.GetUpperBound(0); i++)
+                    {
+                         for (int j = 0; j <= _GameTiles.GetUpperBound(1); j++)
+                         {
+                              _GameTiles[i, j].Update();
+                         }
+                    }
+               
+          }
+
+
+          public void Draw(SpriteBatch spriteBatch)
           {  /// this PLAYER's grid, at position "playerGrid"
                for (int i = 0; i <= _GameTiles.GetUpperBound(0); i++)
                {
                     for (int j = 0; j <= _GameTiles.GetUpperBound(1); j++)
                     {
-                         Vector2 texturePosition = new Vector2(i * (tileSize - 2), j * (tileSize - 2)) + grid;
-                         spriteBatch.Draw(_GameTiles[i, j].Texture, texturePosition, null, Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+                         spriteBatch.Draw(_GameTiles[i, j].Texture, _GameTiles[i,j].Rect, Color.White);
                     }
                }
           }

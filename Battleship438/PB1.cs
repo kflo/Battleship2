@@ -38,16 +38,11 @@ namespace Battleship438
                     this.ButtonUp(this, e);
           }
 
-          public void LoadContent(ContentManager content)
+          public void LoadContent(ContentManager content, Rectangle window)
           {
                Texture = content.Load<Texture2D>(asset);
-               rect = new Rectangle(0, 0, Texture.Width, Texture.Height);
-
-          }
-
-          public void CenterPB(Rectangle window)
-          {
                rect = new Rectangle(window.Width / 2 - Texture.Width / 2, window.Height / 2 - Texture.Height / 2, Texture.Width, Texture.Height);
+
           }
 
           public void Update()
@@ -64,7 +59,7 @@ namespace Battleship438
                }
           }
 
-          public void Draw(SpriteBatch spriteBatch, Vector2 pos) {
+          public void Draw(SpriteBatch spriteBatch) {
                spriteBatch.Draw(Texture, rect, Color.White);
           }
          

@@ -24,7 +24,8 @@ namespace Battleship438
           // mouse states
           private MouseState currMouseState;
           private Rectangle vp;
-          
+          private string str;
+
 
           public BattleshipGame()
           {
@@ -50,7 +51,7 @@ namespace Battleship438
                moveTestShip = new MoveableShip();
                playerGrid = new Vector2(50, 50);
                enemyGrid = new Vector2(470, 50);
-
+               str = "-----------";
                TouchPanel.EnabledGestures = GestureType.FreeDrag;
                graphics.PreferredBackBufferWidth = 1900;
                graphics.PreferredBackBufferHeight = 1600;
@@ -78,16 +79,17 @@ namespace Battleship438
                Vector2 testShipPos = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, GraphicsDevice.Viewport.TitleSafeArea.Y + GraphicsDevice.Viewport.TitleSafeArea.Height / 2);
                moveTestShip.Initialize(Content.Load<Texture2D>("Graphics\\ship2"), testShipPos);
 
-               seaGrid = new SeaGrid(shipList, water);
-               seaGrid2 = new SeaGrid(shipList2, water);
+               seaGrid = new SeaGrid(shipList, playerGrid, water);
+               seaGrid2 = new SeaGrid(shipList2, enemyGrid, water);
                seaGrid.Initialize(red);
                seaGrid2.Initialize(white);
                
                pb1 = new PB1("Graphics\\newGame");
-               pb1.LoadContent(Content);
-               pb1.CenterPB(vp);
+               pb1.LoadContent(Content, vp);
                pb1.ButtonDown += pbcD;
                pb1.ButtonUp += pbcU;
+               seaGrid.Changed += seaGridChanged;
+               seaGrid2.Changed += seaGridChanged;
           }
 
           /// UnloadContent will be called once per game and is the place to unload game-specific content.
@@ -106,28 +108,29 @@ namespace Battleship438
                }
                currMouseState = Mouse.GetState();
                pb1.Update();
+               seaGrid.Update();
+               seaGrid2.Update();
 
                moveTestShip.update(gameTime, graphics.GraphicsDevice);
                base.Update(gameTime);
           }
 
-          /*
-          static void seaGridChanged(object sender, EventArgs e) {
-               Console.WriteLine("The SEAGRID was changed.");
-               Environment.Exit(0);
+          private void seaGridChanged(object sender, EventArgs e) {
+               str = sender.ToString();
           }
-          */
 
           private void pbcD(object sender, EventArgs e) {
                pb1.Texture = Content.Load<Texture2D>("Graphics\\randomize");
                seaGrid.texturize(water);
                seaGrid.Initialize(red);
+               str = "CHANGE HAPPENED";
           }
           private void pbcU(object sender, EventArgs e)
           {
                pb1.Texture = Content.Load<Texture2D>("Graphics\\newGame");
                seaGrid2.texturize(water);
                seaGrid2.Initialize(red);
+               str = "---";
           }
 
 
@@ -142,11 +145,11 @@ namespace Battleship438
                spriteBatch.Begin();
 
                spriteBatch.Draw(background, new Rectangle(0, 0, 1000, 1000), Color.SlateGray);
-               pb1.Draw(spriteBatch, new Vector2(vp.Width / 2 - pb1.Texture.Width / 2, 3 * vp.Height / 4));
+               pb1.Draw(spriteBatch);
 
                // draw the grid
-               seaGrid.Draw(spriteBatch, playerGrid);
-               seaGrid2.Draw(spriteBatch, enemyGrid);
+               seaGrid.Draw(spriteBatch);
+               seaGrid2.Draw(spriteBatch);
 
                spriteBatch.DrawString(motorOil, "PLAYER", new Vector2(vp.Width/14, 20), Color.White);
                spriteBatch.DrawString(motorOil, "ENEMY", new Vector2(5 * vp.Width / 6 - 5, 20), Color.White);
@@ -157,7 +160,7 @@ namespace Battleship438
                spriteBatch.Draw(cursor, new Vector2(currMouseState.X, currMouseState.Y), Color.White);
                spriteBatch.DrawString(fontBody, currMouseState.X.ToString(), new Vector2(340, 50), Color.White);
                spriteBatch.DrawString(fontBody, currMouseState.Y.ToString(), new Vector2(340, 70), Color.White);
-               spriteBatch.DrawString(fontBody, moveTestShip.gesture.GestureType.ToString(), new Vector2(340, 90), Color.White);
+               spriteBatch.DrawString(fontH1, str, new Vector2(340, 90), Color.White);
                spriteBatch.DrawString(fontBody, moveTestShip.Position.ToString(), new Vector2(340, 110), Color.White);
 
                spriteBatch.End();

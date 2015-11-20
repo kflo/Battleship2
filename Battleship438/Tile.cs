@@ -1,7 +1,19 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
+
+public class TileEventArgs : EventArgs
+{
+     public int X;
+     public int Y;
+     public TileEventArgs(int x, int y)
+     {
+          X = x;
+          Y = y;
+     }
+}
 
 /// Tile knows its location on the grid, if it is a ship and if it has been shot before
 public class Tile
@@ -18,17 +30,26 @@ public class Tile
      private bool shipBool = false;
      private Texture2D texture;
 
+     public event EventHandler<TileEventArgs> Changed;
+
+     private void tileChanged(object sender, TileEventArgs e) {
+          if (Changed != null) {
+               Changed(this, e);
+          }
+     }
+
+
      /// The tile constructor will know where it is on the grid, and is its a ship
      /// <param name="row">the row on the grid</param>
      /// <param name="col">the col on the grid</param>
      /// <param name="ship">what ship it is</param>
-     public Tile(int row, int col, Ship ship, Texture2D tex)
+     public Tile(int row, int col, Ship ship, Texture2D tex, Rectangle Rectangle)
      {
           _RowValue = row;
           _ColumnValue = col;
           _Ship = ship;
           Texture = tex;
-          rect = new Rectangle(0, 0, Texture.Width, Texture.Height);
+          Rect = Rectangle;
      }
      
 
@@ -113,12 +134,13 @@ public class Tile
      }
 
      public Texture2D Texture {
-          get {
-               return texture;
-          }
-          set {
-               texture = value;
-          }
+          get { return texture; }
+          set { texture = value; }
+     }
+
+     public Rectangle Rect {
+          get { return rect; }
+          set { rect = value; }
      }
 
      /// Shoot allows a tile to be shot at, and if the 
@@ -133,5 +155,13 @@ public class Tile
           else {
                throw new ApplicationException("You have already shot this square");
           }
+     }
+
+     public void Update()
+     {
+          if (Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed) {
+               tileChanged(this, new TileEventArgs(this.Row, this.Column));
+          }
+
      }
 }
