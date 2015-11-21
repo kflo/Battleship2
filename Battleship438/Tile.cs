@@ -32,7 +32,7 @@ public class Tile
 
      public event EventHandler<TileEventArgs> Changed;
 
-     private void tileChanged(object sender, TileEventArgs e) {
+     private void tileHandler(object sender, TileEventArgs e) {
           if (Changed != null) {
                Changed(this, e);
           }
@@ -152,16 +152,16 @@ public class Tile
                     _Ship.Hit();
                }
           }
-          else {
+          else
                throw new ApplicationException("You have already shot this square");
+          tileHandler(this, new TileEventArgs(this.Row, this.Column)); 
           }
-     }
 
      public void Update()
      {
           if (Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && Shot == false) {
-               tileChanged(this, new TileEventArgs(this.Row, this.Column));
-               Shot = true;
+               Shoot();
+               //Shot = true;
           }
 
      }
