@@ -12,10 +12,10 @@ namespace Battleship438
           GraphicsDeviceManager graphics;
           SpriteBatch spriteBatch; 
           MoveableShip moveTestShip;
-          public PB1 pb1, pb2;
+          public PB1 pbNewGame, pbExit, pbConnect, pbViewHide;
 
           private SpriteFont fontBody, fontH1, fontH2, motorOil, museo, museo29, museoSans;
-          public Texture2D water, white, red, background, cursor;
+          public Texture2D water, white, red, background, cursor, ship;
           private Dictionary<ShipName, Ship> shipList, shipList2;
           private SeaGridAdapter clicker;
           private Player player1, player2;
@@ -100,19 +100,37 @@ namespace Battleship438
 
           private void pbcD(object sender, EventArgs e)
           {
-               if (sender.Equals((object)pb2))
+               if (sender.Equals((object)pbExit))
                     Exit();
-               pb1.Texture = Content.Load<Texture2D>("Graphics\\randomize");
-               player1.Reset(white);
-               newAttack = new AttackResult(ResultOfAttack.None, "---", shotRow, shotCol);
-               str = "RANDOMIZING...";
+               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\view")
+               {
+                    pbViewHide.Asset = "Graphics\\hide";
+                    pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
+                    Player.EnemyGrid.shipTexturize(water);
+               }
+               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\hide")
+               {
+                    pbViewHide.Asset = "Graphics\\view";
+                    pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
+                    Player.EnemyGrid.shipTexturize(ship);
+               }
+
+               else if (sender.Equals((object)pbNewGame)){
+                    pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\randomize");
+                    Player.Reset(water);
+                    newAttack = new AttackResult(ResultOfAttack.None, "---", shotRow, shotCol);
+                    str = "RANDOMIZING...";
+               }
           }
           private void pbcU(object sender, EventArgs e)
           {
-               pb1.Texture = Content.Load<Texture2D>("Graphics\\newGame");
-               player2.Reset(white);
-               str = "Guess where their ships are on the grid!";
-               shotCount = 0;
+               if (sender.Equals((object)pbNewGame))
+               {
+                    pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\newGame");
+                    _players[otherPlayer].Reset(water);
+                    str = "Guess where their ships are on the grid!";
+                    shotCount = 0;
+               }
           }
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -169,14 +187,15 @@ namespace Battleship438
                white = Content.Load<Texture2D>("Graphics\\gridTex");
                red = Content.Load<Texture2D>("Graphics\\gridTexRed");
                cursor = Content.Load<Texture2D>("Graphics\\cursor50");
+               ship = Content.Load<Texture2D>("Graphics\\ship");
 
-               Vector2 testShipPos = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, GraphicsDevice.Viewport.TitleSafeArea.Y + GraphicsDevice.Viewport.TitleSafeArea.Height / 2);
+               Vector2 testShipPos = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, 397);
                moveTestShip.Initialize(Content.Load<Texture2D>("Graphics\\ship2"), testShipPos);
 
                player1 = new Player(shipList, player1Grid, water, red, white);
                player2 = new Player(shipList2, player2Grid, water, red, white);
-               player1.PlayerGrid.Initialize(white);
-               player2.PlayerGrid.Initialize(white);
+               player1.PlayerGrid.Initialize(ship);
+               player2.PlayerGrid.Initialize(ship);
 
                AddDeployedPlayer(player1);
                AddDeployedPlayer(player2);
@@ -184,15 +203,27 @@ namespace Battleship438
                //player2.PlayerGrid.Changed += seaGridChanged;
 
 
-               pb1 = new PB1("Graphics\\newGame");
-               pb1.LoadContent(Content, new Rectangle(0, 0, vp.Width, vp.Height /6));
-               pb1.ButtonDown += pbcD;
-               pb1.ButtonUp += pbcU;
+               pbNewGame = new PB1("Graphics\\newGame");
+               pbNewGame.LoadContent(Content, new Rectangle(0, 0, vp.Width, 2* vp.Height /12));
+               pbNewGame.ButtonDown += pbcD;
+               pbNewGame.ButtonUp += pbcU;
 
-               pb2 = new PB1("Graphics\\exit");
-               pb2.LoadContent(Content, new Rectangle(0,0,vp.Width, vp.Height + 143));
-               pb2.ButtonDown += pbcD;
-               pb2.ButtonUp += pbcU;
+               pbConnect = new PB1("Graphics\\connect");
+               pbConnect.LoadContent(Content, new Rectangle(0, 0, vp.Width, 4 * vp.Height / 12));
+               pbConnect.ButtonDown += pbcD;
+               pbConnect.ButtonUp += pbcU;
+
+               pbViewHide = new PB1("Graphics\\view");
+               pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
+               pbViewHide.ButtonDown += pbcD;
+               pbViewHide.ButtonUp += pbcU;
+
+               pbExit = new PB1("Graphics\\exit");
+               pbExit.LoadContent(Content, new Rectangle(0,0,vp.Width, 8 * vp.Height / 12));
+               pbExit.ButtonDown += pbcD;
+               pbExit.ButtonUp += pbcU;
+
+               
           }
 
           /// UnloadContent will be called once per game and is the place to unload game-specific content.
@@ -212,12 +243,14 @@ namespace Battleship438
                     Exit();
                }
                currMouseState = Mouse.GetState();
-               pb1.Update();
-               pb2.Update();
+               pbNewGame.Update();
+               pbConnect.Update();
+               pbViewHide.Update();
+               pbExit.Update();
                
                moveTestShip.update(gameTime, graphics.GraphicsDevice);
 
-               if (Player.EnemyGrid.Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && attackComplete == false) {
+               if (Player.EnemyGrid.Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && attackComplete == false && !str.Contains("OVER")) {
 
                     attackComplete = true;
                     shotCount++;
@@ -229,7 +262,7 @@ namespace Battleship438
                     
                     //Will exit the game when all players ships are destroyed
                     if (_players[otherPlayer].allDestroyed)
-                         newAttack = new AttackResult(ResultOfAttack.GameOver, newAttack.Ship, newAttack.Text, shotRow, shotCol);
+                         newAttack = new AttackResult(ResultOfAttack.GameOver, newAttack.Ship, "YOU WIN! GAME OVER!", shotRow, shotCol);
 
                     /*
                     if (clicker == Player.EnemyGrid)
@@ -270,8 +303,10 @@ namespace Battleship438
                spriteBatch.Begin();
 
                spriteBatch.Draw(background, new Rectangle(0, 0, 900, 900), Color.SlateGray);
-               pb1.Draw(spriteBatch);
-               pb2.Draw(spriteBatch);
+               pbNewGame.Draw(spriteBatch);
+               pbConnect.Draw(spriteBatch);
+               pbViewHide.Draw(spriteBatch);
+               pbExit.Draw(spriteBatch);
 
                player1.Draw(spriteBatch);
                player2.Draw(spriteBatch);
@@ -284,21 +319,21 @@ namespace Battleship438
                //spriteBatch.DrawString(fontBody, currMouseState.X.ToString(), new Vector2(vp.Width / 2 - fontBody.MeasureString(currMouseState.X.ToString()).X / 2, 90), Color.White);
                //spriteBatch.DrawString(fontBody, currMouseState.Y.ToString(), new Vector2(vp.Width / 2 - fontBody.MeasureString(currMouseState.Y.ToString()).X / 2, 110), Color.White);
                //spriteBatch.DrawString(fontBody, moveTestShip.Position.ToString(), new Vector2(vp.Width / 2 - museoSans.MeasureString(moveTestShip.Position.ToString()).X / 2, 150), Color.DarkSeaGreen);
-               spriteBatch.DrawString(museoSans, player1.shipsLeft().ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.shipsLeft().ToString()).X, 90), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, "Ships", new Vector2(vp.Width / 2 - museoSans.MeasureString("Ships").X / 2, 90), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, player2.shipsLeft().ToString(), new Vector2(vp.Width / 2 + 50, 90), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player1.shipsLeft().ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.shipsLeft().ToString()).X, 200), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, "Ships", new Vector2(vp.Width / 2 - museoSans.MeasureString("Ships").X / 2, 200), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player2.shipsLeft().ToString(), new Vector2(vp.Width / 2 + 50, 200), Color.Goldenrod);
 
-               spriteBatch.DrawString(museoSans, player1.Shots.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Shots.ToString()).X, 130), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, "Shots", new Vector2(vp.Width / 2 - museoSans.MeasureString("Shots").X / 2, 130), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, player2.Shots.ToString(), new Vector2(vp.Width / 2 + 50, 130), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player1.Shots.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Shots.ToString()).X, 235), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, "Shots", new Vector2(vp.Width / 2 - museoSans.MeasureString("Shots").X / 2, 235), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player2.Shots.ToString(), new Vector2(vp.Width / 2 + 50, 235), Color.Goldenrod);
 
-               spriteBatch.DrawString(museoSans, player1.Hits.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Hits.ToString()).X, 170), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, " Hits ", new Vector2(vp.Width / 2 - museoSans.MeasureString(" Hits ").X / 2, 170), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, player2.Hits.ToString(), new Vector2(vp.Width / 2 + 50, 170), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player1.Hits.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Hits.ToString()).X, 270), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, " Hits ", new Vector2(vp.Width / 2 - museoSans.MeasureString(" Hits ").X / 2, 270), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player2.Hits.ToString(), new Vector2(vp.Width / 2 + 50, 270), Color.Goldenrod);
 
-               spriteBatch.DrawString(museoSans, player1.Misses.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Misses.ToString()).X, 210), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, "Misses", new Vector2(vp.Width / 2 - museoSans.MeasureString("Misses").X / 2, 210), Color.Goldenrod);
-               spriteBatch.DrawString(museoSans, player2.Misses.ToString(), new Vector2(vp.Width / 2 + 50, 210), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player1.Misses.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Misses.ToString()).X, 305), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, "Misses", new Vector2(vp.Width / 2 - museoSans.MeasureString("Misses").X / 2, 305), Color.Goldenrod);
+               spriteBatch.DrawString(museoSans, player2.Misses.ToString(), new Vector2(vp.Width / 2 + 50, 305), Color.Goldenrod);
 
                spriteBatch.DrawString(museo, str, new Vector2(vp.Width / 2 - museo.MeasureString(str).X / 2, 360), Color.Goldenrod);
                if (shotCount > 0)
@@ -307,6 +342,8 @@ namespace Battleship438
                     currentPlayer = "YOUR TURN";
                else
                     currentPlayer = "ENEMY'S TURN";
+               if (str.Contains("OVER"))
+                    currentPlayer = "PLAY AGAIN?";
                spriteBatch.DrawString(museo29, currentPlayer, new Vector2(vp.Width / 2 - museo29.MeasureString(currentPlayer).X / 2, 435), Color.Gold);
 
 

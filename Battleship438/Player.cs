@@ -65,7 +65,7 @@ public class Player : IEnumerable<Ship>
 
      public bool allDestroyed {
           //Check if all ships are destroyed... -1 for the none ship
-          get { return _playerGrid.ShipsKilled == 5; }
+          get { return _playerGrid.ShipsKilled == 2; }
      }
 
      /// Returns the Player's ship with the given name.

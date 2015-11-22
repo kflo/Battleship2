@@ -94,6 +94,7 @@ public class Ship
 
      public void texturize(Texture2D tex) {
           foreach (Tile tile in _tiles)
+               if (!tile.Shot)
                tile.Texture = tex; 
      }
 

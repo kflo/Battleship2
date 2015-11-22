@@ -85,6 +85,9 @@
     <Content Include="Content\Graphics\background.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Graphics\connect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Graphics\cursor50.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -101,6 +104,9 @@
     <Content Include="Content\Graphics\gridTexWater.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Graphics\hide.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Graphics\miniBS.png" />
     <Content Include="Content\Graphics\newGame.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -108,10 +114,16 @@
     <Content Include="Content\Graphics\randomize.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Graphics\ship.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Graphics\ship1.png" />
     <Content Include="Content\Graphics\ship2.png" />
     <Content Include="Content\Graphics\shuttle.png" />
     <Content Include="Content\Graphics\stars.jpg" />
+    <Content Include="Content\Graphics\view.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />

@@ -23,16 +23,18 @@ public class SeaGridAdapter : ISeaGrid
 
      /// MyGrid_Changed causes the grid to be redrawn by raising a changed event
      private void adapterChanged(object sender, TileEventArgs e) {
-          if (Changed != null) {
+          if (Changed != null)
                Changed(this, e);
-          }
      }
 
-     private void originalSeaGridChanged(object sender, TileEventArgs e)
-     {
+     private void originalSeaGridChanged(object sender, TileEventArgs e) {
           adapterChanged(sender, e);
      }
 
+
+     public void shipTexturize(Texture2D shipTex) {
+          _MyGrid.shipTexurize(shipTex);
+     }
 
      #region "ISeaGrid Members"
 
@@ -41,12 +43,11 @@ public class SeaGridAdapter : ISeaGrid
      public TileView Item(int x, int y) {
           TileView result = _MyGrid.Item(x, y);
 
-          if (result == TileView.Ship) {
+          if (result == TileView.Ship)
                return TileView.Sea;
-          } else {
+          else 
                return result;
-          }
-     }
+         }
 
 
      /// Get the width of a tile

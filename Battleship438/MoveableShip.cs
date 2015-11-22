@@ -13,43 +13,34 @@ namespace Battleship438
           // Position of the Player relative to the upper left side of the screen
           public Vector2 Position = new Vector2(10, 10);
           float playerMoveSpeed = 4.0f;
-          public GestureSample gesture;
+          //public GestureSample gesture;
 
          // keyboard states
           KeyboardState currentKeyboardState;
           KeyboardState previousKeyboardState;
 
-          MouseState currentMouseState;
+          //MouseState currentMouseState;
           //MouseState previousMouseState;
           
-
-
-          // Get the width of the player ship
           public int Width          {
                get { return PlayerTexture.Width; }
           }
 
-
-          // Get the height of the player ship
           public int Height          {
                get { return PlayerTexture.Height; }
           }
-
-
 
           public void Initialize(Texture2D texture, Vector2 position)          {
                PlayerTexture = texture;
                Position = position;
           }
 
-
-
           public void update(GameTime gameTime, GraphicsDevice graphics)          {
 
                previousKeyboardState = currentKeyboardState;
                currentKeyboardState = Keyboard.GetState();
 
-               currentMouseState = Mouse.GetState();
+               //currentMouseState = Mouse.GetState();
                
                /*// Use Touch input
                while (TouchPanel.IsGestureAvailable)               {
@@ -57,7 +48,7 @@ namespace Battleship438
                     if (gesture.GestureType == GestureType.FreeDrag)                    {
                          gesture.Delta.Normalize();
                     }
-               }               */
+               }               
 
                // Use Mouse input
                Vector2 mousePosition = new Vector2(currentMouseState.X, currentMouseState.Y);
@@ -68,6 +59,8 @@ namespace Battleship438
                     posDelta = posDelta * playerMoveSpeed;
                     Position += posDelta;
                }
+               */
+
                // Use the Keyboard / Dpad
                if (currentKeyboardState.IsKeyDown(Keys.Left)) {
                     Position.X -= playerMoveSpeed;

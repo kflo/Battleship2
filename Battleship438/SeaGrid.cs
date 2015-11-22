@@ -52,6 +52,11 @@ public class SeaGrid : ISeaGrid
           }
      }
 
+     public void shipTexurize(Texture2D shipTex) {
+          foreach (var item in _shipList)
+               item.Value.texturize(shipTex);
+     }
+
      /// randomly initializes the SHIPS from the Dictionary with TEXTURE shipTex
      public void Initialize(Texture2D shipTex)     {
           Direction heading = Direction.LeftRight;
@@ -253,7 +258,7 @@ public class SeaGrid : ISeaGrid
                }
           }
           finally {
-               gridChanged(this, new TileEventArgs(row, col));
+          //     gridChanged(this, new TileEventArgs(row, col));
           }
      }
 

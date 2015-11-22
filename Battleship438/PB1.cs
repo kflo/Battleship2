@@ -19,11 +19,16 @@ namespace Battleship438
                set   {texture = value;}     
           }
 
+          public string Asset {
+               get { return asset; }
+               set { asset = value; }
+          }
+
           public event EventHandler ButtonDown;
           public event EventHandler ButtonUp;
 
           public PB1(string asset) {
-               this.asset = asset;
+               this.Asset = asset;
           }
 
           private void pbDown(object sender, EventArgs e) {
@@ -40,7 +45,7 @@ namespace Battleship438
 
           public void LoadContent(ContentManager content, Rectangle window)
           {
-               Texture = content.Load<Texture2D>(asset);
+               Texture = content.Load<Texture2D>(Asset);
                rect = new Rectangle(window.Width / 2 - Texture.Width / 2, window.Height / 2 - Texture.Height / 2, Texture.Width, Texture.Height);
 
           }
