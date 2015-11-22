@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 /// in conjuncture with the SeaGridAdapter to mask the position of the ships.
 public class SeaGrid : ISeaGrid
 {
-     int tileSize = 30;
+     int tileSize = 28;
      private const int _WIDTH = 10;
      private const int _HEIGHT = 10;
      private int _ShipsKilled = 0;
@@ -17,20 +17,23 @@ public class SeaGrid : ISeaGrid
      private Rectangle rect, tileRect;
      private Tile[,] _GameTiles;
      private Dictionary<ShipName, Ship> _shipList;
-     private Texture2D red;
+     private Texture2D Water, Red, White;
 
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
      /// SeaGrid constructor, a seagrid has a number of tiles stored in an array
-     public SeaGrid(Dictionary<ShipName, Ship> ships, Vector2 vector, Texture2D tex)     {
-          rect = new Rectangle((int)vector.X, (int)vector.Y, tileSize * 10 - 20, tileSize * 10 - 20);
+     public SeaGrid(Dictionary<ShipName, Ship> ships, Vector2 vector, Texture2D water, Texture2D red, Texture2D white)     {
+          Water = water;
+          Red = red;
+          White = white;
+          rect = new Rectangle((int)vector.X, (int)vector.Y, tileSize * 10, tileSize * 10);
           _GameTiles = new Tile[_WIDTH, _HEIGHT];
           //fill array with empty Tiles
           for (int i = 0; i <= _WIDTH - 1; i++)          {
                for (int j = 0; j <= _HEIGHT - 1; j++)               {
-                    tileRect = new Rectangle(i * (tileSize - 2) + rect.X, j * (tileSize - 2) + rect.Y, tex.Width, tex.Height);
-                    _GameTiles[i, j] = new Tile(i, j, null, tex, tileRect);
+                    tileRect = new Rectangle(i * (tileSize) + Rect.X, j * (tileSize) + Rect.Y, water.Width, water.Height);
+                    _GameTiles[i, j] = new Tile(i, j, null, water, tileRect);
                     _GameTiles[i, j].Changed += tileChanged;
                }
           }
@@ -49,16 +52,15 @@ public class SeaGrid : ISeaGrid
           }
      }
 
-     /// randomly initializes the ships from the Dictionary
-     public void Initialize(Texture2D texture)     {
-          red = texture;
+     /// randomly initializes the SHIPS from the Dictionary with TEXTURE shipTex
+     public void Initialize(Texture2D shipTex)     {
           Direction heading = Direction.LeftRight;
           int row = 0;
           int col = 0;
           foreach (var item in _shipList)          { 
                //ITEM is the ship Dictionary pair (KEY = SHIPNAME, VALUE = SHIP)
                randomize(ref heading, ref row, ref col, item.Value);
-               MoveShip(row, col, item.Key, heading, texture);
+               MoveShip(row, col, item.Key, heading, shipTex);
           }
      }
 
@@ -111,9 +113,9 @@ public class SeaGrid : ISeaGrid
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
      /// The sea grid has changed and should be redrawn.
-     public event EventHandler Changed;
+     public event EventHandler<TileEventArgs> Changed;
 
-     private void gridChanged(object sender, EventArgs e)     {
+     private void gridChanged(object sender, TileEventArgs e)     {
           if (Changed != null)
                Changed(this, e);
      }
@@ -149,6 +151,21 @@ public class SeaGrid : ISeaGrid
                          return false;
                }
                return true;
+          }
+     }
+
+     public Rectangle Rect {
+          get { return rect; }
+          //set { rect = value; }
+     }
+
+     public void Reset() {
+          foreach (var item in _shipList) {
+               //item.Value.texturize(water);
+               item.Value.Remove();
+               texturize(Water);
+               _ShipsKilled = 0;
+               // TODO: set all tiles SHOT to false
           }
      }
 
@@ -197,7 +214,7 @@ public class SeaGrid : ISeaGrid
                throw new ApplicationException(e.Message);
           }
           finally {
-               //grid_Changed();
+               gridChanged(this, new TileEventArgs(row, col));
           }
      }
 
@@ -210,34 +227,39 @@ public class SeaGrid : ISeaGrid
           try {
                //tile is already hit
                if (_GameTiles[row, col].Shot) {
-                    return new AttackResult(ResultOfAttack.ShotAlready, "have already attacked [" + col + "," + row + "]!", row, col);
+                    return new AttackResult(ResultOfAttack.ShotAlready, "already attacked", row, col);
                }
 
                _GameTiles[row, col].Shoot();
 
                //there is no ship on the tile
-               if (_GameTiles[row, col].Ship == null) {
-                    return new AttackResult(ResultOfAttack.Miss, "missed", row, col);
+               if (_GameTiles[row, col].Ship == null)
+               {
+                    _GameTiles[row, col].Texture = White;
+                    return new AttackResult(ResultOfAttack.Miss, "missed!", row, col);
                }
-
-               //all ship's tiles have been destroyed
-               if (_GameTiles[row, col].Ship.IsDestroyed) {
+               else if (_GameTiles[row, col].Ship.IsDestroyed)
+               {
                     _GameTiles[row, col].Shot = true;
+                    _GameTiles[row, col].Texture = Red;
                     _ShipsKilled += 1;
-                    return new AttackResult(ResultOfAttack.Destroyed, _GameTiles[row, col].Ship, "destroyed the enemy's", row, col);
+                    return new AttackResult(ResultOfAttack.Destroyed, _GameTiles[row, col].Ship, "destroyed the enemy's " + _GameTiles[row, col].Ship.Name + "(" + _GameTiles[row, col].Ship.Size + ")" + "!", row, col);
                }
-
-               //else hit but not destroyed
-               return new AttackResult(ResultOfAttack.Hit, "hit something!", row, col);
+               else
+               {
+                    _GameTiles[row, col].Shot = true;
+                    _GameTiles[row, col].Texture = Red;
+                    return new AttackResult(ResultOfAttack.Hit, "hit something!", row, col);
+               }
           }
           finally {
-               //grid_Changed();
+               gridChanged(this, new TileEventArgs(row, col));
           }
      }
 
      private void tileChanged(object sender, TileEventArgs e)     {
-          _GameTiles[e.X, e.Y].Texture = red;
-          AttackResult result = HitTile(e.X, e.Y);
+          gridChanged(this, new TileEventArgs(e.X, e.Y));
+          //AttackResult result = HitTile(e.X, e.Y);
      }
 
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

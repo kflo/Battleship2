@@ -33,53 +33,44 @@ public class Tile
      public event EventHandler<TileEventArgs> Changed;
 
      private void tileHandler(object sender, TileEventArgs e) {
-          if (Changed != null) {
+          if (Changed != null) 
                Changed(this, e);
-          }
      }
 
-
      /// The tile constructor will know where it is on the grid, and is its a ship
-     /// <param name="row">the row on the grid</param>
-     /// <param name="col">the col on the grid</param>
-     /// <param name="ship">what ship it is</param>
-     public Tile(int row, int col, Ship ship, Texture2D tex, Rectangle Rectangle)
-     {
+     public Tile(int row, int col, Ship ship, Texture2D tex, Rectangle Rectangle) {
           _RowValue = row;
           _ColumnValue = col;
           _Ship = ship;
           Texture = tex;
           Rect = Rectangle;
      }
-     
 
-     /// Has the tile been shot?
+     /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+     /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
      /// <value>indicate if the tile has been shot</value>
-     /// <returns>true if the tile was shot</returns>
      public bool Shot {
           get { return _Shot; }
           set { _Shot = value; }
      }
 
-     public bool hasShip
-     {
+     public bool hasShip {
           get { return shipBool; }
      }
-
      
      /// The row of the tile in the grid
-     /// <value>the row index of the tile in the grid</value>
-     /// <returns>the row index of the tile</returns>
      public int Row {
           get { return _RowValue; }
      }
 
      /// The column of the tile in the grid
-     /// <value>the column of the tile in the grid</value>
-     /// <returns>the column of the tile in the grid</returns>
      public int Column {
           get { return _ColumnValue; }
      }
+
+     /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+     /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
      /// Ship allows for a tile to check if there is ship and add a ship to a tile
      public Ship Ship {
@@ -90,15 +81,12 @@ public class Tile
                     shipBool = true;
                     if (value != null) {
                          _Ship.AddTile(this);
-                         //Texture = red;
-                         
                     }
                } else {
                     throw new InvalidOperationException("There is already a ship at [" + Row + ", " + Column + "]");
                }
           }
      }
-
      
      /// Clearship will remove the ship from the tile
      public void ClearShip() {
@@ -112,23 +100,17 @@ public class Tile
                //if there is no ship in the tile
                if (_Ship == null) {
                     //and the tile has been hit
-                    if (_Shot) {
+                    if (_Shot) 
                          return TileView.Miss;
-                    }
-                    else {
-                         //and the tile hasn't been hit
+                    else 
                          return TileView.Sea;
-                    }
                }
                else {
                     //if there is a ship and it has been hit
-                    if ((_Shot)) {
+                    if ((_Shot))
                          return TileView.Hit;
-                    }
-                    else {
-                         //if there is a ship and it hasn't been hit
+                    else 
                          return TileView.Ship;
-                    }
                }
           }
      }
@@ -143,26 +125,23 @@ public class Tile
           set { rect = value; }
      }
 
-     /// Shoot allows a tile to be shot at, and if the 
-     /// tile has been hit before it will give an error
+     /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+     /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+     /// Shoot allows a tile to be shot at; if tile was hit before, gives an error
      internal void Shoot() {
-          if ((false == Shot)) {
+          if ((Shot == false)) {
                Shot = true;
-               if (_Ship != null) {
+               if (_Ship != null)
                     _Ship.Hit();
-               }
           }
           else
                throw new ApplicationException("You have already shot this square");
-          tileHandler(this, new TileEventArgs(this.Row, this.Column)); 
           }
 
-     public void Update()
-     {
-          if (Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && Shot == false) {
-               Shoot();
-               //Shot = true;
-          }
-
+     public void Update() {
+          if (Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed)
+               tileHandler(this, new TileEventArgs(this.Row, this.Column));
+          //   Shoot();
      }
 }

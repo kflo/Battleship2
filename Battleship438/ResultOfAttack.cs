@@ -14,5 +14,8 @@ public enum ResultOfAttack
      ShotAlready,
 
      /// The player killed all of the opponents ships
-     GameOver
+     GameOver,
+
+     /// Nothing
+     None
 }

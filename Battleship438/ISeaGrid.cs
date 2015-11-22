@@ -11,7 +11,7 @@ public interface ISeaGrid
      int Height { get; }
 
      /// Indicates that the grid has changed.
-     event EventHandler Changed;
+     event EventHandler<TileEventArgs> Changed;
 
      /// Provides access to the given row/column
      /// <param name="row">the row to access</param>
@@ -25,4 +25,5 @@ public interface ISeaGrid
      /// <param name="col">the column of the tile</param>
      /// <returns>the result of the attack</returns>
      AttackResult HitTile(int row, int col);
+
 }
