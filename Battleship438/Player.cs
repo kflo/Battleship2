@@ -64,37 +64,21 @@ public class Player : IEnumerable<Ship>
      }
 
      public bool allDestroyed {
-          //Check if all ships are destroyed... -1 for the none ship
           get { return _playerGrid.ShipsKilled == 5; }
      }
 
-     /// Returns the Player's ship with the given name.
-     /// <returns>The ship with the indicated name</returns>
-     public Ship Ship {
-          get {
-               ShipName name = new ShipName();
-               if (name == ShipName.None)
-                    return null;
-               return _Ships[name];
-          }
-     }
-
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-     public int Shots     {
-          get { return _shots; }
-     }
+     public int Shots { get { return _shots; } }
 
-     public int Hits     {
-          get { return _hits; }
-     }
+     public int Hits { get { return _hits; } }
 
-     public int Misses     {
-          get { return _misses; }
-     }
-    
-     public int Score     {
+     public int Misses { get { return _misses; } }
+
+     public int shipsLeft() { return _Ships.Count - PlayerGrid.ShipsKilled; }
+
+     public int Score {
           get {
                if (allDestroyed)
                     return 0;
@@ -102,10 +86,11 @@ public class Player : IEnumerable<Ship>
                     return (Hits * 12) - Shots - (PlayerGrid.ShipsKilled * 20);
           }
      }
+     
 
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-     
+
      /// Makes it possible to enumerate over the ships the player has.
      /// <returns>A Ship enumerator</returns>
      public IEnumerator<Ship> GetShipEnumerator()     {
@@ -132,22 +117,10 @@ public class Player : IEnumerable<Ship>
           return lst.GetEnumerator();
      }
 
-     public int shipsLeft()
-     {
-          return _Ships.Count - PlayerGrid.ShipsKilled;
-     }
-
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-     /// Vitual Attack allows the player to shoot
-     public virtual AttackResult Attack()     {
-          //human does nothing here...
-          return null;
-     }
 
      /// Shoot at a given row/column
-     /// <returns>the result of the attack</returns>
      internal AttackResult Shoot(int row, int col) {
           AttackResult result = default(AttackResult);
           result = EnemyGrid.HitTile(row, col);

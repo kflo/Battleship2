@@ -16,19 +16,19 @@ namespace Battleship438
 
           private SpriteFont fontBody, fontH1, fontH2, motorOil, museo, museo29, museoSans;
           public Texture2D water, white, red, background, cursor, ship;
-          private Dictionary<ShipName, Ship> shipList, shipList2;
+          private Dictionary<ShipName, Ship> shipList1, shipList2;
           private SeaGridAdapter clicker;
           private Player player1, player2;
-          private Vector2 player1Grid, player2Grid;
+          private Vector2 player1Grid, enemyGrid;
 
           private MouseState currMouseState;
           private Rectangle vp;
           private string str, currentPlayer;
           AttackResult newAttack;
           private int otherPlayer, shotRow, shotCol;
-          private bool attackComplete;
+          private bool attacking;
           private Player[] _players = new Player[3];
-          private int _playerIndex, shotCount;
+          private int _playerIndex;
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           ///  C L A S S F U N C T I O N S   C L A S S F U N C T I O N S   C L A S S F U N C T I O N S   C L
@@ -69,6 +69,7 @@ namespace Battleship438
           }
 
           /// player turn toggler -- taking turns shooting
+          /*
           public AttackResult Shoot(int row, int col)          {
                AttackResult newAttack = default(AttackResult);
                otherPlayer = (_playerIndex + 1) % 2;
@@ -86,52 +87,7 @@ namespace Battleship438
                     _playerIndex = otherPlayer;
 
                return newAttack;
-          }
-
-          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-          ///  E V E N T F U N C T I O N S   E V E N T F U N C T I O N S   E V E N T F U N C T I O N S   E V
-          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-          private void seaGridChanged(object sender, TileEventArgs e) {
-               clicker = (SeaGridAdapter)sender;
-               shotRow = e.X;
-               shotCol = e.Y;
-          }
-
-          private void pbcD(object sender, EventArgs e)
-          {
-               if (sender.Equals((object)pbExit))
-                    Exit();
-               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\view")
-               {
-                    pbViewHide.Asset = "Graphics\\hide";
-                    pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
-                    Player.EnemyGrid.shipTexturize(water);
-               }
-               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\hide")
-               {
-                    pbViewHide.Asset = "Graphics\\view";
-                    pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
-                    Player.EnemyGrid.shipTexturize(ship);
-               }
-
-               else if (sender.Equals((object)pbNewGame)){
-                    pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\randomize");
-                    Player.Reset(water);
-                    newAttack = new AttackResult(ResultOfAttack.None, "---", shotRow, shotCol);
-                    str = "RANDOMIZING...";
-               }
-          }
-          private void pbcU(object sender, EventArgs e)
-          {
-               if (sender.Equals((object)pbNewGame))
-               {
-                    pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\newGame");
-                    _players[otherPlayer].Reset(water);
-                    str = "Guess where their ships are on the grid!";
-                    shotCount = 0;
-               }
-          }
+          } */
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           ///  I N I T I A L I Z E   I N I T I A L I Z E   I N I T I A L I Z E   I N I T I A L I Z E   I N I
@@ -143,22 +99,27 @@ namespace Battleship438
           /// Calling base.Initialize will enumerate through any components and initialize them as well.
           protected override void Initialize() {
                vp = GraphicsDevice.Viewport.TitleSafeArea;
-               shipList = new Dictionary<ShipName, Ship>();
-               shipList.Add(ShipName.AircraftCarrier, new Ship(ShipName.AircraftCarrier));
-               shipList.Add(ShipName.Battleship, new Ship(ShipName.Battleship));
-               shipList.Add(ShipName.Destroyer, new Ship(ShipName.Destroyer));
-               shipList.Add(ShipName.Submarine, new Ship(ShipName.Submarine));
-               shipList.Add(ShipName.TugBoat, new Ship(ShipName.TugBoat));
-               shipList2 = shipList;
+               shipList1 = new Dictionary<ShipName, Ship>();
+               shipList1.Add(ShipName.AircraftCarrier, new Ship(ShipName.AircraftCarrier));
+               shipList1.Add(ShipName.Battleship, new Ship(ShipName.Battleship));
+               shipList1.Add(ShipName.Destroyer, new Ship(ShipName.Destroyer));
+               shipList1.Add(ShipName.Submarine, new Ship(ShipName.Submarine));
+               shipList1.Add(ShipName.TugBoat, new Ship(ShipName.TugBoat));
+               shipList2 = new Dictionary<ShipName, Ship>();
+               shipList2.Add(ShipName.AircraftCarrier, new Ship(ShipName.AircraftCarrier));
+               shipList2.Add(ShipName.Battleship, new Ship(ShipName.Battleship));
+               shipList2.Add(ShipName.Destroyer, new Ship(ShipName.Destroyer));
+               shipList2.Add(ShipName.Submarine, new Ship(ShipName.Submarine));
+               shipList2.Add(ShipName.TugBoat, new Ship(ShipName.TugBoat));
 
                moveTestShip = new MoveableShip();
                player1Grid = new Vector2(vp.Width / 14, 60);
-               player2Grid = new Vector2( 8 * vp.Width / 13, 60);
-               str = "Guess where their ships are on the grid!";
+               enemyGrid = new Vector2( 8 * vp.Width / 13, 60);
+               str = "Guess where the enemy's ships are on the grid!";
                TouchPanel.EnabledGestures = GestureType.FreeDrag;
 
-               attackComplete = false;
-               shotCount = 0;
+               newAttack = default(AttackResult);
+               attacking = false;
                _playerIndex = 0;
                otherPlayer = (_playerIndex + 1) % 2;
 
@@ -192,15 +153,15 @@ namespace Battleship438
                Vector2 testShipPos = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, 397);
                moveTestShip.Initialize(Content.Load<Texture2D>("Graphics\\ship2"), testShipPos);
 
-               player1 = new Player(shipList, player1Grid, water, red, white);
-               player2 = new Player(shipList2, player2Grid, water, red, white);
+               player1 = new Player(shipList1, player1Grid, water, red, white);
                player1.PlayerGrid.Initialize(ship);
+               player2 = new Player(shipList2, enemyGrid, water, red, white);
                player2.PlayerGrid.Initialize(ship);
 
                AddDeployedPlayer(player1);
                AddDeployedPlayer(player2);
                Player.EnemyGrid.Changed += seaGridChanged;
-               //player2.PlayerGrid.Changed += seaGridChanged;
+               _players[otherPlayer].EnemyGrid.Changed += seaGridChanged;
 
 
                pbNewGame = new PB1("Graphics\\newGame");
@@ -225,10 +186,68 @@ namespace Battleship438
 
                
           }
-
           /// UnloadContent will be called once per game and is the place to unload game-specific content.
-          protected override void UnloadContent() {
-               /// TODO: Unload any non ContentManager content here
+          protected override void UnloadContent() {// TODO: Unload any non ContentManager content here 
+          }
+
+
+          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          ///  E V E N T F U N C T I O N S   E V E N T F U N C T I O N S   E V E N T F U N C T I O N S   E V
+          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+          private void seaGridChanged(object sender, TileEventArgs e)
+          {
+               clicker = (SeaGridAdapter)sender;
+               shotRow = e.X;
+               shotCol = e.Y;
+          }
+
+          private void pbcD(object sender, EventArgs e)
+          {
+               if (sender.Equals((object)pbExit))
+                    Exit();
+               else if (sender.Equals((object)pbConnect))
+               {
+
+               }
+
+               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\view")
+               { /// HIDE THE SHIPS
+                    pbViewHide.Asset = "Graphics\\hide";
+                    pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
+                    Player.EnemyGrid.shipTexturize(water);
+               }
+               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\hide")
+               { /// VIEW THE SHIPS
+                    pbViewHide.Asset = "Graphics\\view";
+                    pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
+                    Player.EnemyGrid.shipTexturize(ship);
+               }
+
+               else if (sender.Equals((object)pbNewGame))
+               {
+                    pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\randomize");
+                    player1.Reset(ship);
+                    str = "RANDOMIZING...";
+                    newAttack = default(AttackResult);
+                    //******************
+                    //TODO: make reset not switch grid sides (due to "Player.")
+                    //was: Player.Reset(ship);
+                    //******************
+               }
+          }
+          private void pbcU(object sender, EventArgs e)
+          {
+               if (sender.Equals((object)pbNewGame))
+               {
+                    pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\newGame");
+                    player2.Reset(ship);
+                    str = "Guess where the enemy's ships are on the grid!";
+                    //******************
+                    //TODO: make reset not switch grid sides
+                    //was: _players[otherPlayer].Reset(ship);
+                    //******************
+               }
           }
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -243,18 +262,12 @@ namespace Battleship438
                     Exit();
                }
                currMouseState = Mouse.GetState();
-               pbNewGame.Update();
-               pbConnect.Update();
-               pbViewHide.Update();
-               pbExit.Update();
-               
                moveTestShip.update(gameTime, graphics.GraphicsDevice);
 
-               if (Player.EnemyGrid.Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && attackComplete == false && !str.Contains("OVER")) {
+               if (Player.EnemyGrid.Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && attacking == false && !str.Contains("OVER")) {
 
-                    attackComplete = true;
-                    shotCount++;
-
+                    attacking = true;
+                    
                     Player.Update();  //This sets the global shotROW and shotCOL
                     //new shotRow collected
                     //new shotCol collected
@@ -262,7 +275,7 @@ namespace Battleship438
                     
                     //Will exit the game when all players ships are destroyed
                     if (_players[otherPlayer].allDestroyed)
-                         newAttack = new AttackResult(ResultOfAttack.GameOver, newAttack.Ship, "YOU WIN! GAME OVER!", shotRow, shotCol);
+                         newAttack = new AttackResult(ResultOfAttack.GameOver, newAttack.Ship, "PLAYER " + (_playerIndex+1) + " WINS! GAME OVER!", shotRow, shotCol);
 
                     /*
                     if (clicker == Player.EnemyGrid)
@@ -273,18 +286,21 @@ namespace Battleship438
                     */
                     str = newAttack.Text;
 
-                    //change player if the last hit was a miss
+                    //change player if the last hit was a miss/hit
                     if (newAttack.Value != ResultOfAttack.ShotAlready) {
-
+                         Player.EnemyGrid.Changed -= seaGridChanged;
                          _playerIndex = otherPlayer;
                          otherPlayer = (_playerIndex + 1) % 2;
                          Player.EnemyGrid.Changed += seaGridChanged;
                     }
                }
 
-               //if (Player.EnemyGrid.Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Released && attackComplete == true)
-                    attackComplete = false;
+               attacking = false;
 
+               pbNewGame.Update();
+               pbConnect.Update();
+               pbViewHide.Update();
+               pbExit.Update();
 
                base.Update(gameTime);
           }
@@ -294,7 +310,6 @@ namespace Battleship438
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           /// This is called when the game should draw itself.
-          /// <param name="gameTime">Provides a snapshot of timing values.</param>
           protected override void Draw(GameTime gameTime) {
 
                graphics.GraphicsDevice.Clear(Color.SlateGray);
@@ -311,14 +326,12 @@ namespace Battleship438
                player1.Draw(spriteBatch);
                player2.Draw(spriteBatch);
 
-               spriteBatch.DrawString(motorOil, "PLAYER", new Vector2(vp.Width/14, 30), Color.White);
-               spriteBatch.DrawString(motorOil, "ENEMY", new Vector2(5 * vp.Width / 6 - 5, 30), Color.White);
                moveTestShip.Draw(spriteBatch);
                spriteBatch.Draw(cursor, new Vector2(currMouseState.X, currMouseState.Y), Color.White);
 
-               //spriteBatch.DrawString(fontBody, currMouseState.X.ToString(), new Vector2(vp.Width / 2 - fontBody.MeasureString(currMouseState.X.ToString()).X / 2, 90), Color.White);
-               //spriteBatch.DrawString(fontBody, currMouseState.Y.ToString(), new Vector2(vp.Width / 2 - fontBody.MeasureString(currMouseState.Y.ToString()).X / 2, 110), Color.White);
-               //spriteBatch.DrawString(fontBody, moveTestShip.Position.ToString(), new Vector2(vp.Width / 2 - museoSans.MeasureString(moveTestShip.Position.ToString()).X / 2, 150), Color.DarkSeaGreen);
+               spriteBatch.DrawString(motorOil, "PLAYER 1", new Vector2(vp.Width / 14, 30), Color.White);
+               spriteBatch.DrawString(motorOil, "PLAYER 2", new Vector2(11 * vp.Width / 14 - 7, 30), Color.White);
+
                spriteBatch.DrawString(museoSans, player1.shipsLeft().ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.shipsLeft().ToString()).X, 200), Color.Goldenrod);
                spriteBatch.DrawString(museoSans, "Ships", new Vector2(vp.Width / 2 - museoSans.MeasureString("Ships").X / 2, 200), Color.Goldenrod);
                spriteBatch.DrawString(museoSans, player2.shipsLeft().ToString(), new Vector2(vp.Width / 2 + 50, 200), Color.Goldenrod);
@@ -336,16 +349,14 @@ namespace Battleship438
                spriteBatch.DrawString(museoSans, player2.Misses.ToString(), new Vector2(vp.Width / 2 + 50, 305), Color.Goldenrod);
 
                spriteBatch.DrawString(museo, str, new Vector2(vp.Width / 2 - museo.MeasureString(str).X / 2, 360), Color.Goldenrod);
-               if (shotCount > 0)
+               if (newAttack != null)
                     spriteBatch.DrawString(museo, shotRow+1 + ", " + (shotCol+1), new Vector2(vp.Width / 2 - museo.MeasureString(shotRow + 1 + ", " + (shotCol+1)).X / 2, 397), Color.Goldenrod);
-               if (_playerIndex == 0)
-                    currentPlayer = "YOUR TURN";
-               else
-                    currentPlayer = "ENEMY'S TURN";
+
+
+               currentPlayer = "PLAYER " + (_playerIndex+1) + "'S TURN";
                if (str.Contains("OVER"))
                     currentPlayer = "PLAY AGAIN?";
                spriteBatch.DrawString(museo29, currentPlayer, new Vector2(vp.Width / 2 - museo29.MeasureString(currentPlayer).X / 2, 435), Color.Gold);
-
 
                //stop drawing
                spriteBatch.End();

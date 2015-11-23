@@ -44,9 +44,9 @@ public class SeaGrid : ISeaGrid
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
      ///set Texture of ALL tiles in seaGrid
-     public void texturize(Texture2D texture)     {
-          for (int i = 0; i <= _WIDTH - 1; i++)          {
-               for (int j = 0; j <= _HEIGHT - 1; j++)               {
+     public void texturize(Texture2D texture) {
+          for (int i = 0; i <= _WIDTH - 1; i++) {
+               for (int j = 0; j <= _HEIGHT - 1; j++) {
                     _GameTiles[i, j].Texture = texture;
                }
           }
@@ -58,11 +58,11 @@ public class SeaGrid : ISeaGrid
      }
 
      /// randomly initializes the SHIPS from the Dictionary with TEXTURE shipTex
-     public void Initialize(Texture2D shipTex)     {
+     public void Initialize(Texture2D shipTex) {
           Direction heading = Direction.LeftRight;
           int row = 0;
           int col = 0;
-          foreach (var item in _shipList)          { 
+          foreach (var item in _shipList) { 
                //ITEM is the ship Dictionary pair (KEY = SHIPNAME, VALUE = SHIP)
                randomize(ref heading, ref row, ref col, item.Value);
                MoveShip(row, col, item.Key, heading, shipTex);
@@ -164,14 +164,18 @@ public class SeaGrid : ISeaGrid
           //set { rect = value; }
      }
 
-     public void Reset() {
-          foreach (var item in _shipList) {
-               //item.Value.texturize(water);
+     public void Reset(){
+          foreach (var item in _shipList)
                item.Value.Remove();
-               texturize(Water);
-               _ShipsKilled = 0;
-               // TODO: set all tiles SHOT to false
+
+          for (int i = 0; i <= _WIDTH - 1; i++) {
+               for (int j = 0; j <= _HEIGHT - 1; j++) {
+                    _GameTiles[i, j].Shot = false;
+               }
           }
+          texturize(Water);
+          _ShipsKilled = 0;
+          // TODO: set all tiles SHOT to false
      }
 
      /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -245,14 +249,14 @@ public class SeaGrid : ISeaGrid
                }
                else if (_GameTiles[row, col].Ship.IsDestroyed)
                {
-                    _GameTiles[row, col].Shot = true;
+                    //_GameTiles[row, col].Shot = true;
                     _GameTiles[row, col].Texture = Red;
                     _ShipsKilled += 1;
-                    return new AttackResult(ResultOfAttack.Destroyed, _GameTiles[row, col].Ship, "destroyed the enemy's " + _GameTiles[row, col].Ship.Name + "(" + _GameTiles[row, col].Ship.Size + ")" + "!", row, col);
+                    return new AttackResult(ResultOfAttack.Destroyed, "destroyed the enemy's " + _GameTiles[row, col].Ship.Name + "(" + _GameTiles[row, col].Ship.Size + ")" + "!", row, col);
                }
                else
                {
-                    _GameTiles[row, col].Shot = true;
+                    //_GameTiles[row, col].Shot = true;
                     _GameTiles[row, col].Texture = Red;
                     return new AttackResult(ResultOfAttack.Hit, "hit something!", row, col);
                }
@@ -263,7 +267,7 @@ public class SeaGrid : ISeaGrid
      }
 
      private void tileChanged(object sender, TileEventArgs e)     {
-          gridChanged(this, new TileEventArgs(e.X, e.Y));
+          gridChanged(this, e);
           //AttackResult result = HitTile(e.X, e.Y);
      }
 

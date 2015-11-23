@@ -1,8 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 /// The SeaGridAdapter allows for the change in a sea grid view. Whenever a ship is
 /// presented it changes the view into a sea tile instead of a ship tile.
@@ -28,15 +26,13 @@ public class SeaGridAdapter : ISeaGrid
      }
 
      private void originalSeaGridChanged(object sender, TileEventArgs e) {
-          adapterChanged(sender, e);
+          adapterChanged(this, e);
      }
 
 
      public void shipTexturize(Texture2D shipTex) {
           _MyGrid.shipTexurize(shipTex);
      }
-
-     #region "ISeaGrid Members"
 
      /// Changes the discovery grid. Where there is a ship we will sea water
      /// <returns>a tile, either what it actually is, or if it was a ship then return a sea tile</returns>
@@ -70,7 +66,6 @@ public class SeaGridAdapter : ISeaGrid
      public AttackResult HitTile(int row, int col) {
           return _MyGrid.HitTile(row, col);
      }
-     #endregion
 
      public void texturize(Texture2D tex) {
           _MyGrid.texturize(tex);

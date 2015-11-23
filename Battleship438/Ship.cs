@@ -63,6 +63,7 @@ public class Ship
 
      /// Remove clears the tile back to a sea tile
      public void Remove() {
+          _hitsTaken = 0;
           foreach (Tile tile in _tiles) {
                tile.ClearShip();
           }
