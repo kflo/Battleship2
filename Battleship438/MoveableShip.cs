@@ -12,16 +12,13 @@ namespace Battleship438
 
           // Position of the Player relative to the upper left side of the screen
           public Vector2 Position = new Vector2(10, 10);
-          float playerMoveSpeed = 4.0f;
+          float playerMoveSpeed = 8.0f;
           //public GestureSample gesture;
 
          // keyboard states
           KeyboardState currentKeyboardState;
           KeyboardState previousKeyboardState;
 
-          //MouseState currentMouseState;
-          //MouseState previousMouseState;
-          
           public int Width          {
                get { return PlayerTexture.Width; }
           }
@@ -40,8 +37,6 @@ namespace Battleship438
                previousKeyboardState = currentKeyboardState;
                currentKeyboardState = Keyboard.GetState();
 
-               //currentMouseState = Mouse.GetState();
-               
                /*// Use Touch input
                while (TouchPanel.IsGestureAvailable)               {
                     gesture = TouchPanel.ReadGesture();
@@ -61,7 +56,7 @@ namespace Battleship438
                }
                */
 
-               // Use the Keyboard / Dpad
+               // Use the Keyboard
                if (currentKeyboardState.IsKeyDown(Keys.Left)) {
                     Position.X -= playerMoveSpeed;
                }
@@ -78,8 +73,7 @@ namespace Battleship438
                Position.X = MathHelper.Clamp(Position.X, 0, graphics.Viewport.Width - Width);
                Position.Y = MathHelper.Clamp(Position.Y, 0, graphics.Viewport.Height - Height);
           }
-          
-
+   
 
           public void Draw(SpriteBatch spriteBatch)          {
                spriteBatch.Draw(PlayerTexture, Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
