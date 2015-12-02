@@ -2,7 +2,7 @@
 using Battleship438.Library;
 using Lidgren.Network;
 
-namespace Battleship438.Manager
+namespace Battleship438.Network
 {
      class ManagerNetwork
      {

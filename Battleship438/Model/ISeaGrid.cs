@@ -20,7 +20,7 @@ namespace Battleship438.Model
           /// <param name="col">the column to access</param>
           /// <value>what the player can see at that location</value>
           /// <returns>what the player can see at that location</returns>
-          TileView Item(int row, int col);
+          TileView TileView(int row, int col);
 
           /// Mark the indicated tile as shot.
           /// <param name="row">the row of the tile</param>

@@ -10,6 +10,7 @@ namespace Battleship438.Model
      {
 
           private SeaGrid _MyGrid;
+          public bool Cheat = false;
           /// Create the SeaGridAdapter, with the grid, and it will allow it to be changed
           /// <param name="grid">the grid that needs to be adapted</param>
           /// 
@@ -32,20 +33,21 @@ namespace Battleship438.Model
           }
 
 
-          public void shipTexturize(Texture2D shipTex) {
+          /*public void shipTexturize(Texture2D shipTex) {
                _MyGrid.shipTexturize(shipTex);
-          }
+          }*/
 
           /// Changes the discovery grid. Where there is a ship we will sea water
           /// <returns>a tile, either what it actually is, or if it was a ship then return a sea tile</returns>
-          public TileView Item(int x, int y) {
-               TileView result = _MyGrid.Item(x, y);
-
-               if (result == TileView.Ship)
-                    return TileView.Sea;
-               else 
-                    return result;
+          public TileView TileView(int x, int y)
+          {
+               TileView result = _MyGrid.TileView(x, y);
+               if (result == Model.TileView.Ship)
+                    if (Cheat == false)
+                         return Model.TileView.Sea;
+               return result;
           }
+
 
 
           /// Get the width of a tile
@@ -69,11 +71,11 @@ namespace Battleship438.Model
                return _MyGrid.HitTile(row, col);
           }
 
-          public void texturize(Texture2D tex) {
+          /*public void texturize(Texture2D tex) {
                _MyGrid.texturize(tex);
-          }
-          public void Initialize(Texture2D tex){
-               _MyGrid.Initialize(tex);
+          }*/
+          public void Initialize(){
+               _MyGrid.Initialize();
           }
 
           public void Update()
@@ -81,8 +83,28 @@ namespace Battleship438.Model
                _MyGrid.Update();
           }
 
-          public void Draw(SpriteBatch spriteBatch) {
-               _MyGrid.Draw(spriteBatch);
+          public void Draw(SpriteBatch spriteBatch){
+               for (int i = 0; i < Width; i++){
+                    for (int j = 0; j < Height; j++){
+                         switch (TileView(i, j)){
+                              case Model.TileView.Sea:
+                                   spriteBatch.Draw(_MyGrid.Water, _MyGrid.TileRect(i, j), Color.White);
+                                   break;
+                              case Model.TileView.Miss:
+                                   spriteBatch.Draw(_MyGrid.White, _MyGrid.TileRect(i, j), Color.White);
+                                   break;
+                              case Model.TileView.Ship:
+                                   spriteBatch.Draw(_MyGrid.ShipTex, _MyGrid.TileRect(i, j), Color.White);
+                                   break;
+                              case Model.TileView.Hit:
+                                   spriteBatch.Draw(_MyGrid.Red, _MyGrid.TileRect(i, j), Color.White);
+                                   break;
+                              default:
+                                   spriteBatch.Draw(_MyGrid.Water, _MyGrid.TileRect(i, j), Color.White);
+                                   break;
+                         }
+                    }
+               }
           }
      }
 }

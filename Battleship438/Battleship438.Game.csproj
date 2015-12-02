@@ -57,13 +57,15 @@
     <ApplicationIcon>battleship438.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Battleship438.Program</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BattleshipGame.cs" />
-    <Compile Include="Manager\ClientNetworkManager.cs" />
-    <Compile Include="Manager\INetworkManager.cs" />
-    <Compile Include="Manager\ServerNetworkManager.cs" />
+    <Compile Include="Network\ClientNetworkManager.cs" />
+    <Compile Include="Network\Data.cs" />
+    <Compile Include="Network\INetworkManager.cs" />
+    <Compile Include="Network\ServerNetworkManager.cs" />
     <Compile Include="Model\AttackResult.cs" />
     <Compile Include="Model\Direction.cs" />
     <Compile Include="Model\ISeaGrid.cs" />
@@ -76,7 +78,6 @@
     <Compile Include="Model\Tile.cs" />
     <Compile Include="Model\TileView.cs" />
     <Compile Include="MoveableShip.cs" />
-    <Compile Include="Manager\ManagerNetwork.cs" />
     <Compile Include="PB1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -189,12 +190,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="obj\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Battleship438.Library\Battleship438.Library.csproj">
-      <Project>{8d4b5f59-e10e-4d1e-b452-e3b40da4833f}</Project>
-      <Name>Battleship438.Library</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

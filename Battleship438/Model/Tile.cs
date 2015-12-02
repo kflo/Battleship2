@@ -29,8 +29,7 @@ namespace Battleship438.Model
           //the tile has been shot at
           private bool _Shot = false;
           private bool shipBool = false;
-          private Texture2D texture;
-
+          
           public event EventHandler<TileEventArgs> Changed;
 
           private void tileHandler(object sender, TileEventArgs e) {
@@ -39,11 +38,10 @@ namespace Battleship438.Model
           }
 
           /// The tile constructor will know where it is on the grid, and is its a ship
-          public Tile(int row, int col, Ship ship, Texture2D tex, Rectangle Rectangle) {
+          public Tile(int row, int col, Ship ship, Rectangle Rectangle) {
                _RowValue = row;
                _ColumnValue = col;
                _Ship = ship;
-               Texture = tex;
                Rect = Rectangle;
           }
 
@@ -93,6 +91,7 @@ namespace Battleship438.Model
           public void ClearShip() {
                _Ship = null;
                shipBool = false;
+               Shot = false;
           }
 
           /// View is able to tell the grid what the tile is
@@ -116,11 +115,7 @@ namespace Battleship438.Model
                }
           }
 
-          public Texture2D Texture {
-               get { return texture; }
-               set { texture = value; }
-          }
-
+          
           public Rectangle Rect {
                get { return rect; }
                set { rect = value; }

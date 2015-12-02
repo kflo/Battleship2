@@ -1,27 +1,27 @@
-﻿using Lidgren.Network;
-using Microsoft.Xna.Framework;
-using Battleship438.Library;
+﻿using System;
+using Lidgren.Network;
 
-namespace Battleship438.Manager
+namespace Battleship438.Network
 {
-     public class ClientNetworkManager : INetworkManager   {
+     public class ServerNetworkManager : INetworkManager{
           //=======================================================================//
           #region Constants and Fields
 
           private bool _isDisposed;
-          public NetClient Client { get; private set; }
-          public Library.Player Player { get; set; }
+          public NetServer Server { get; private set; }
 
           #endregion
           //=======================================================================//
           #region Public Methods and Operators
 
+          public bool Running { get; set; } = false;
+
           public void Connect(){
                var config = new NetPeerConfiguration("Battleship438"){
-                    //SimulatedMinimumLatency = 0.2f,
-                    // SimulatedLoss = 0.1f
+                    Port = Convert.ToInt32("14242"),
+                    // SimulatedMinimumLatency = 0.2f, 
+                    // SimulatedLoss = 0.1f 
                };
-
                config.EnableMessageType(NetIncomingMessageType.WarningMessage);
                config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
                config.EnableMessageType(NetIncomingMessageType.ErrorMessage);
@@ -29,24 +29,17 @@ namespace Battleship438.Manager
                config.EnableMessageType(NetIncomingMessageType.Data);
                config.EnableMessageType(NetIncomingMessageType.DebugMessage);
                config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
-               this.Client = new NetClient(config);
-               this.Client.Start();
-               Player = new Library.Player("Kevin F", 20, 10);
-
-               var outMsg = Client.CreateMessage();
-               outMsg.Write((byte)PacketType.Login);
-               outMsg.Write(Player.Name);
-               outMsg.Write(Player.X);
-               outMsg.Write(Player.Y);
-               this.Client.Connect("localhost", 14241, outMsg);
+               this.Server = new NetServer(config);
+               this.Server.Start();
+               Running = true;
           }
 
           public NetOutgoingMessage CreateMessage(){
-               return this.Client.CreateMessage();
+               return this.Server.CreateMessage();
           }
 
           public void Disconnect(){
-               this.Client.Disconnect("Bye");
+               this.Server.Shutdown("Bye");
           }
 
           public void Dispose(){
@@ -54,18 +47,18 @@ namespace Battleship438.Manager
           }
 
           public NetIncomingMessage ReadMessage(){
-               return this.Client.ReadMessage();
+               return this.Server.ReadMessage();
           }
 
           public void Recycle(NetIncomingMessage im){
-               this.Client.Recycle(im);
+               this.Server.Recycle(im);
           }
 
           public void SendMessage(int x, int y){
-               NetOutgoingMessage om = this.Client.CreateMessage();
+               NetOutgoingMessage om = this.Server.CreateMessage();
                om.Write(x);
                om.Write(y);
-               this.Client.SendMessage(om, NetDeliveryMethod.ReliableOrdered);
+               this.Server.SendToAll(om, NetDeliveryMethod.ReliableUnordered);
           }
 
           #endregion
@@ -76,6 +69,7 @@ namespace Battleship438.Manager
                if (this._isDisposed) return;
                if (disposing)
                     this.Disconnect();
+               Running = false;
                this._isDisposed = true;
           }
           #endregion

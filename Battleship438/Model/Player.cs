@@ -16,7 +16,7 @@ namespace Battleship438.Model
           private Dictionary<ShipName, Ship> _Ships = new Dictionary<ShipName, Ship>();
           private SeaGrid _playerGrid;
           private SeaGridAdapter _enemyGrid;
-          private Texture2D Water, Red, White;
+          private Texture2D Water, Red, White, ShipTex;
 
           private int _shots;
           private int _hits;
@@ -26,12 +26,13 @@ namespace Battleship438.Model
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
    
-          public Player(Dictionary<ShipName, Ship> shipList, Vector2 gridVector, Texture2D water, Texture2D red, Texture2D white) {
+          public Player(Dictionary<ShipName, Ship> shipList, Vector2 gridVector, Texture2D water, Texture2D red, Texture2D white, Texture2D shipTex) {
                Water = water;
                Red = red;
                White = white;
+               ShipTex = shipTex;
                _Ships = shipList;
-               _playerGrid = new SeaGrid(_Ships, gridVector, water, red, white);
+               _playerGrid = new SeaGrid(_Ships, gridVector, water, red, white, shipTex);
 
                //RandomizeDeployment();
           }
@@ -146,7 +147,7 @@ namespace Battleship438.Model
           public void Reset(Texture2D tex)
           {
                PlayerGrid.Reset();
-               PlayerGrid.Initialize(tex);
+               PlayerGrid.Initialize();
                _shots = 0;
                _hits = 0;
                _misses = 0;

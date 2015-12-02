@@ -1,13 +1,13 @@
 ﻿using System;
 using Lidgren.Network;
 
-namespace Battleship438.Manager
+namespace Battleship438.Network
 {
     public interface INetworkManager : IDisposable
     {
-        #region Public Methods and Operators
+         bool Running { get; set; }
 
-        void Connect();
+         void Connect();
 
         NetOutgoingMessage CreateMessage();
 
@@ -18,7 +18,6 @@ namespace Battleship438.Manager
         void Recycle(NetIncomingMessage im);
 
         void SendMessage(int x, int y);
-
-        #endregion
+          
     }
 }

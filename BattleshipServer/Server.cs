@@ -67,8 +67,8 @@ namespace Battleship438.Server
                                    break;
                               case NetIncomingMessageType.Data:
                                    Console.WriteLine("********" + NetIncomingMessageType.Data);
-                                   var data = im.ReadString();
-                                   Console.WriteLine(data);
+                                   var number = im.ReadInt32();
+                                   Console.WriteLine(number);
                                    break;
                               case NetIncomingMessageType.Receipt:
                                    Console.WriteLine("********" + NetIncomingMessageType.Receipt);
