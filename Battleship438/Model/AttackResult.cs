@@ -1,70 +1,30 @@
-namespace Battleship438.Model
+using Battleship438Game.Model.Enum;
+
+namespace Battleship438Game.Model
 {
-     /// AttackResult gives the result after a shot has been made.
-     public class AttackResult
-     {
-          private ResultOfAttack _Value;
-          private Ship _Ship;
-          private string _Text;
-          private int _Row;
-          private int _Column;
+     public class AttackResult {
+          public ResultOfAttack Value { get; set; }
+          public int Ship { get; }
+          public string Text { get; set; }
+          public int Row { get; set; }
+          public int Column { get; set; }
 
-          /// The result of the attack
-          /// <value>The result of the attack</value>
-          /// <returns>The result of the attack</returns>
-          public ResultOfAttack Value     {
-               get { return _Value; }
+          public AttackResult(ResultOfAttack value, string text, int row, int column) {
+               Value = value;
+               Text = text;
+               Ship = 0;
+               Row = row;
+               Column = column;
           }
 
-          /// The ship, if any, involved in this result
-          /// <value>The ship, if any, involved in this result</value>
-          /// <returns>The ship, if any, involved in this result</returns>
-          public Ship Ship     {
-               get { return _Ship; }
+          public AttackResult(ResultOfAttack value, int ship, string text, int row, int column) : this(value, text, row, column) {
+               Ship = ship;
           }
 
-          /// A textual description of the result.
-          /// <value>A textual description of the result.</value>
-          /// <returns>A textual description of the result.</returns>
-          public string Text     {
-               get { return _Text; }
-          }
-
-          /// The row where the attack occurred
-          public int Row     {
-               get { return _Row; }
-          }
-
-          /// The column where the attack occurred
-          public int Column     {
-               get { return _Column; }
-          }
-
-          /// Set the _Value to the PossibleAttack value
-          /// <param name="value">either hit, miss, destroyed, shotalready</param>
-          public AttackResult(ResultOfAttack value, string text, int row, int column)     {
-               _Value = value;
-               _Text = text;
-               _Ship = null;
-               _Row = row;
-               _Column = column;
-          }
-
-          /// Set the _Value to the PossibleAttack value, and the _Ship to the ship
-          /// <param name="value">either hit, miss, destroyed, shotalready</param>
-          /// <param name="ship">the ship information</param>
-          public AttackResult(ResultOfAttack value, Ship ship, string text, int row, int column) : this(value, text, row, column) {
-               _Ship = ship;
-          }
-
-          /// Displays the textual information about the attack
-          /// <returns>The textual information about the attack</returns>
-          public override string ToString()     {
-               if (_Ship == null)
-               {
+          public override string ToString() {
+               if (Ship == 0)
                     return Text;
-               }
-               return Text + " " + _Ship.Name;
+               return Text + " " + Ship;
           }
      }
 }

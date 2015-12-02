@@ -1,77 +1,93 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Battleship438Game.Model;
+using Battleship438Game.Model.Enum;
+using Battleship438Game.Network;
+using Battleship438Game.Network.Messages;
+using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
-using System;
-using Battleship438.Model;
-using Battleship438.Network;
-using Lidgren.Network;
 
-namespace Battleship438
+namespace Battleship438Game
 {
-     public class BattleshipGame : Microsoft.Xna.Framework.Game
+     public class BattleshipGame : Game
      {
           readonly GraphicsDeviceManager _graphics;
           private SpriteBatch _spriteBatch;
           private MoveableShip _moveTestShip;
-          private readonly INetworkManager NetworkManager;
+          private readonly INetworkManager _networkManager;
           private Color _color;
           private SpriteFont fontBody, fontH1, fontH2, motorOil, museo, museo29, museoSans;
-          private Texture2D water, white, red, background, cursor, ship;
+          private Texture2D water, white, red, background, background0, background1, cursor, ship;
           private Dictionary<ShipName, Ship> shipList1, shipList2;
           private PB1 pbNewGame, pbExit, pbConnect, pbViewHide;
           private Rectangle vp;
           private SeaGridAdapter clicker;
-
           // PLAYERS
           private readonly Player[] _players = new Player[3];
           private int _playerIndex, _otherPlayer;
-          private Player player1, player2;
+          private Player player1, enemyPlayer;
           private Vector2 player1Grid, enemyGrid;
 
           // EVENT use
           private int shotRow, shotCol;
-          private bool attacking, easterEgg;
-          
+          private bool ableToShoot, easterEgg;
+
           // MISC
           private MouseState currMouseState;
           private string str, currentPlayer;
           private AttackResult newAttack;
-          
-          
+
+
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           ///  C L A S S F U N C T I O N S   C L A S S F U N C T I O N S   C L A S S F U N C T I O N S   C L
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-          public BattleshipGame(INetworkManager networkManager) {
+          public BattleshipGame(INetworkManager networkManager)
+          {
                _graphics = new GraphicsDeviceManager(this);
                Content.RootDirectory = "Content";
                Window.AllowUserResizing = true;
                _graphics.PreferredBackBufferWidth = 900;
                _graphics.PreferredBackBufferHeight = 500;
-               this.NetworkManager = networkManager;
+               this._networkManager = networkManager;
                _color = Color.CornflowerBlue;
                //_graphics.IsFullScreen = true;
           }
 
-          private bool IsHost => this.NetworkManager is ServerNetworkManager;
+          public BattleshipGame()
+          {
+               _graphics = new GraphicsDeviceManager(this);
+               Content.RootDirectory = "Content";
+               Window.AllowUserResizing = true;
+               _graphics.PreferredBackBufferWidth = 900;
+               _graphics.PreferredBackBufferHeight = 500;
+               //this._networkManager = networkManager;
+               _color = Color.CornflowerBlue;
+               //_graphics.IsFullScreen = true;
+          }
+
+          private bool IsHost => this._networkManager is ServerNetworkManager;
 
           public Player Player => _players[_playerIndex];
 
           public Player Enemy => _players[_otherPlayer];
 
 
-          private void AddDeployedPlayer(Player p) {
+          private void AddDeployedPlayer(Player p)
+          {
                if (_players[0] == null)
                     _players[0] = p;
-               else {
+               else
+               {
                     _players[1] = p;
                     CompleteDeployment();
                }
           }
 
-          private void CompleteDeployment() {
+          private void CompleteDeployment()
+          {
                _players[0].Enemy = new SeaGridAdapter(_players[1].PlayerGrid);
                _players[1].Enemy = new SeaGridAdapter(_players[0].PlayerGrid);
           }
@@ -79,11 +95,12 @@ namespace Battleship438
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           ///  I N I T I A L I Z E   I N I T I A L I Z E   I N I T I A L I Z E   I N I T I A L I Z E   I N I
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-          
+
           /// Allows the game to perform any initialization it needs to before starting to run.
           /// This is where it can query for any required services and load any non-graphic related content.  
           /// Calling base.Initialize will enumerate through any components and initialize them as well.
-          protected override void Initialize() {
+          protected override void Initialize()
+          {
                vp = GraphicsDevice.Viewport.TitleSafeArea;
                shipList1 = new Dictionary<ShipName, Ship> {
                     {ShipName.AircraftCarrier, new Ship(ShipName.AircraftCarrier)},
@@ -102,17 +119,17 @@ namespace Battleship438
 
                _moveTestShip = new MoveableShip();
                player1Grid = new Vector2(vp.Width / 14, 60);
-               enemyGrid = new Vector2( 8 * vp.Width / 13, 60);
+               enemyGrid = new Vector2(8 * vp.Width / 13, 60);
                str = "Hit the CONNECT button to find an oppenent.\nThen hit the NEW GAME button to start playing!";
                currentPlayer = "BATTLESHIP";
                //TouchPanel.EnabledGestures = GestureType.FreeDrag;
 
                newAttack = default(AttackResult);
-               attacking = true;
+               ableToShoot = false;
                easterEgg = false;
                _playerIndex = 0;
                _otherPlayer = (_playerIndex + 1) % 2;
-               
+
                base.Initialize();
           }
 
@@ -121,7 +138,8 @@ namespace Battleship438
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           /// LoadContent will be called once per game and is the place to load all of your content.
-          protected override void LoadContent() {
+          protected override void LoadContent()
+          {
                // Create a new SpriteBatch, which can be used to draw textures.
                _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -133,7 +151,9 @@ namespace Battleship438
                museo29 = Content.Load<SpriteFont>("Fonts\\museo29");
                museoSans = Content.Load<SpriteFont>("Fonts\\museoSans");
 
-               background = Content.Load<Texture2D>("Graphics\\background");
+               background0 = Content.Load<Texture2D>("Graphics\\background0");
+               background = background0;
+               background1 = Content.Load<Texture2D>("Graphics\\background");
                water = Content.Load<Texture2D>("Graphics\\gridTexWater");
                white = Content.Load<Texture2D>("Graphics\\gridTex");
                red = Content.Load<Texture2D>("Graphics\\gridTexRed");
@@ -144,22 +164,21 @@ namespace Battleship438
                _moveTestShip.Initialize(Content.Load<Texture2D>("Graphics\\ship2"), testShipPos);
 
                player1 = new Player(shipList1, player1Grid, water, red, white, ship);
-               player2 = new Player(shipList2, enemyGrid, water, red, white, ship);
+               enemyPlayer = new Player(shipList2, enemyGrid, water, red, white, ship);
                //TODO: initialize only local player...
 
                AddDeployedPlayer(player1);
-               AddDeployedPlayer(player2);
+               AddDeployedPlayer(enemyPlayer);
 
-               Player.EnemyGrid.Changed += seaGridChanged;
-               _players[_otherPlayer].EnemyGrid.Changed += seaGridChanged;
-
+               player1.EnemyGrid.Changed += seaGridChanged;
+               //_players[_otherPlayer].EnemyGrid.Changed += seaGridChanged;
 
                pbNewGame = new PB1("Graphics\\newGame");
-               pbNewGame.LoadContent(Content, new Rectangle(0, 0, vp.Width, 2* vp.Height /12));
+               pbNewGame.LoadContent(Content, new Rectangle(0, 0, vp.Width, 2 * vp.Height / 12));
                pbNewGame.ButtonDown += pbcD;
                pbNewGame.ButtonUp += pbcU;
 
-               pbConnect = new PB1("Graphics\\connect");
+               pbConnect = IsHost ? new PB1("Graphics\\host") : new PB1("Graphics\\connect");
                pbConnect.LoadContent(Content, new Rectangle(0, 0, vp.Width, 4 * vp.Height / 12));
                pbConnect.ButtonDown += pbcD;
                pbConnect.ButtonUp += pbcU;
@@ -169,14 +188,15 @@ namespace Battleship438
                pbViewHide.ButtonUp += pbcU;
 
                pbExit = new PB1("Graphics\\exit");
-               pbExit.LoadContent(Content, new Rectangle(0,0,vp.Width, 8 * vp.Height / 12));
+               pbExit.LoadContent(Content, new Rectangle(0, 0, vp.Width, 8 * vp.Height / 12));
                pbExit.ButtonDown += pbcD;
                pbExit.ButtonUp += pbcU;
 
-               
+
           }
           /// UnloadContent will be called once per game and is the place to unload game-specific content.
-          protected override void UnloadContent() {// TODO: Unload any non ContentManager content here 
+          protected override void UnloadContent()
+          {// TODO: Unload any non ContentManager content here 
           }
 
 
@@ -193,56 +213,100 @@ namespace Battleship438
 
           private void pbcD(object sender, EventArgs e)
           {
-               if (sender.Equals((object)pbExit)) {
+               if (sender.Equals(pbExit))
+               {
                     Exit();
                }
-
-               else if (sender.Equals((object)pbConnect))
+               else if (sender.Equals(pbConnect) && IsHost && pbConnect.Asset == "Graphics\\host")
                {
-                    NetworkManager.Connect();
-                    //str = _clientNetworkManager.Client.ConnectionStatus.ToString();
-                    str = NetworkManager.GetType().ToString();
-
+                    pbConnect.Asset = "Graphics\\disconnect";
+                    pbConnect.LoadContent(Content, new Rectangle(0, 0, vp.Width, 4 * vp.Height / 12));
+                    if (_networkManager.Running)
+                         _networkManager.Disconnect();
+                    str = _networkManager.Running.ToString();
                }
-               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\view")
+               else if (sender.Equals(pbConnect) && IsHost && pbConnect.Asset == "Graphics\\disconnect")
+               {
+                    pbConnect.Asset = "Graphics\\host";
+                    pbConnect.LoadContent(Content, new Rectangle(0, 0, vp.Width, 4 * vp.Height / 12));
+                    if (_networkManager.Running)
+                         _networkManager.Disconnect();
+                    str = _networkManager.Running.ToString();
+               }
+
+               else if (sender.Equals(pbConnect) && pbConnect.Asset == "Graphics\\connect")
+               {
+                    pbConnect.Asset = "Graphics\\disconnect";
+                    pbConnect.LoadContent(Content, new Rectangle(0, 0, vp.Width, 4 * vp.Height / 12));
+                    if (_networkManager.Running)
+                         _networkManager.Disconnect();
+                    str = _networkManager.Running.ToString();
+               }
+
+               else if (sender.Equals(pbConnect) && pbConnect.Asset == "Graphics\\disconnect")
+               {
+                    pbConnect.Asset = "Graphics\\connect";
+                    pbConnect.LoadContent(Content, new Rectangle(0, 0, vp.Width, 4 * vp.Height / 12));
+                    if (_networkManager.Running)
+                         _networkManager.Disconnect();
+                    str = _networkManager.Running.ToString();
+               }
+
+               else if (sender.Equals(pbViewHide) && pbViewHide.Asset == "Graphics\\view")
                { // HIDE THE SHIPS
                     pbViewHide.Asset = "Graphics\\hide";
                     pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
-                    Player.EnemyGrid.Cheat = false;
+                    player1.EnemyGrid.Cheat = false;
                }
-               else if (sender.Equals((object)pbViewHide) && pbViewHide.Asset == "Graphics\\hide")
+               else if (sender.Equals(pbViewHide) && pbViewHide.Asset == "Graphics\\hide")
                { // VIEW THE SHIPS
                     pbViewHide.Asset = "Graphics\\view";
                     pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
-                    Player.EnemyGrid.Cheat = true;
+                    player1.EnemyGrid.Cheat = true;
                }
 
-               else if (sender.Equals((object)pbNewGame))
+               else if (sender.Equals(pbNewGame))
                {
                     pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\randomize");
-                    player1.Reset(ship);
+                    player1.Reset();
                     str = "RANDOMIZING...";
                     newAttack = default(AttackResult); // SETS TO NULL
-                    //******************
-                    //TODO: make reset not switch grid sides (due to "Player.")
-                    //was: Player.Reset(ship);
-                    //******************
                }
           }
           private void pbcU(object sender, EventArgs e)
           {
-               if (!sender.Equals(pbNewGame)) return;
-               pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\newGame");
-               player2.Reset(pbViewHide.Asset == "Graphics\\hide" ? water : ship);
-               str = "Guess where the enemy's ships are on the grid!";
-               currentPlayer = "PLAYER " + (_playerIndex + 1) + "'S TURN";
-               attacking = false;
-               if(NetworkManager.Running)
-                    _color = NetworkManager.Running == true ? Color.Green : Color.Red;
-               //******************
-               //TODO: make reset not switch grid sides
-               //was: _players[_otherPlayer].Reset(ship);
-               //******************
+               if (sender.Equals(pbConnect) && IsHost && pbConnect.Asset == "Graphics\\disconnect")
+               {
+                    _networkManager.Connect();
+                    str = "CONNECTING...";
+
+               }
+               else if (sender.Equals(pbConnect) && IsHost && pbConnect.Asset == "Graphics\\host")
+               {
+                    str = "DISCONNECTED -- NOT HOSTING...";
+
+               }
+
+               else if (sender.Equals(pbConnect) && pbConnect.Asset == "Graphics\\disconnect")
+               {
+                    _networkManager.Connect();
+                    str = "CONNECTING...";
+               }
+               else if (sender.Equals(pbConnect) && pbConnect.Asset == "Graphics\\connect")
+               {
+                    str = "DISCONNECTED.";
+
+               }
+               else if (sender.Equals(pbNewGame))
+               {
+                    pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\newGame");
+                    _networkManager.SendMessage(new NewGameMessage());
+                    enemyPlayer.Reset();
+                    str = "Guess where the enemy's ships are on the grid!";
+                    currentPlayer = "PLAYER " + (_playerIndex + 1) + "'S TURN";
+                    ableToShoot = true;
+               }
+
           }
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -251,11 +315,21 @@ namespace Battleship438
 
           /// Allows the game to run logic (updating the world, checking for collisions, input, etc.
           /// <param name="gameTime">Provides a snapshot of timing values.</param>
-          protected override void Update(GameTime gameTime) {
-               if (Keyboard.GetState().IsKeyDown(Keys.Escape)) {
+          protected override void Update(GameTime gameTime)
+          {
+               if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+               {
                     _graphics.IsFullScreen = false;
                     Exit();
                }
+
+               if (newAttack == null && _networkManager.Running)
+               {
+                    _color = _networkManager.Connection() == 0 ? Color.Red : Color.Green;
+                    background = _networkManager.Connection() == 0 ? background0 : background1;
+               }
+               this.ProcessNetworkMessages();
+
                currMouseState = Mouse.GetState();
                _moveTestShip.update(gameTime, _graphics.GraphicsDevice);
                if (_moveTestShip.Position == new Vector2(GraphicsDevice.Viewport.Width - _moveTestShip.Width, 0) && !easterEgg)
@@ -264,40 +338,17 @@ namespace Battleship438
                     easterEgg = true;
                }
 
+               if (player1.EnemyGrid.Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && ableToShoot == true && !str.Contains("OVER"))
+               {
+                    ableToShoot = false;
 
-               if (Player.EnemyGrid.Rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && attacking == false && !str.Contains("OVER")) {
-
-                    attacking = true;
-                    
-                    Player.Update();  //This sets the global shotROW and shotCOL
-                    if (NetworkManager.Running)
-                         NetworkManager.SendMessage(shotRow, shotCol);
-                    newAttack = Player.Shoot(shotRow, shotCol);
-                    
-                    //game over when all players ships are destroyed
-                    if (_players[_otherPlayer].allDestroyed)
-                         newAttack = new AttackResult(ResultOfAttack.GameOver, newAttack.Ship, "PLAYER " + (_playerIndex+1) + " WINS! GAME OVER!", shotRow, shotCol);
-
-                    if (Player == player1)
-                         str = "YOU ";
-                    else
-                         str = "PLAYER " + (_playerIndex+1) + " ";
-
-                    if (Player != player1 && newAttack.Value == ResultOfAttack.Destroyed)
-                         str += "destroyed your " + newAttack.Ship.Name + "(" + newAttack.Ship.Size + ")" + "!";
-                    else
-                         str += newAttack.Text;
-
-                    //change player if the last hit was a miss/hit
-                    if (newAttack.Value != ResultOfAttack.ShotAlready) {
-                         Player.EnemyGrid.Changed -= seaGridChanged;
-                         _playerIndex = _otherPlayer;
-                         _otherPlayer = (_playerIndex + 1) % 2;
-                         Player.EnemyGrid.Changed += seaGridChanged;
-                    }
-                    attacking = false;
+                    player1.Update(); //This sets the global shotROW and shotCOL
+                    if (_networkManager.Connection() > 0)
+                         _networkManager.SendMessage(new VectorMessage(shotRow, shotCol));
+                    //attacking = true;
                }
 
+               
                pbNewGame.Update();
                pbConnect.Update();
                pbViewHide.Update();
@@ -306,20 +357,157 @@ namespace Battleship438
                base.Update(gameTime);
           }
 
+          //======================================================================//
+          //======================================================================//
+
+          public void ProcessNetworkMessages()
+          {
+               if (!_networkManager.Running) return;
+               NetIncomingMessage im;
+               while ((im = this._networkManager.ReadMessage()) != null)
+               {
+                    switch (im.MessageType)
+                    {
+                         case NetIncomingMessageType.VerboseDebugMessage:
+                         case NetIncomingMessageType.DebugMessage:
+                         case NetIncomingMessageType.WarningMessage:
+                         case NetIncomingMessageType.ErrorMessage:
+                              str = im.ReadString();
+                              break;
+                         case NetIncomingMessageType.StatusChanged:
+                              switch ((NetConnectionStatus) im.ReadByte())
+                              {
+                                   case NetConnectionStatus.Connected:
+                                        if (this.IsHost)
+                                             str = "CONNECTED TO " + im.SenderConnection;
+                                        else
+                                             str = "CONNECTED TO" + im.SenderConnection;
+                                        break;
+                                   case NetConnectionStatus.Disconnected:
+                                        str = !this.IsHost
+                                             ? "{0} Disconnected"
+                                             : "Disconnected from " + im.SenderEndPoint;
+                                        break;
+                                   case NetConnectionStatus.RespondedAwaitingApproval:
+                                        NetOutgoingMessage hailMessage = this._networkManager.CreateMessage();
+                                        hailMessage.Write("APPROVED");
+                                        im.SenderConnection.Approve(hailMessage);
+                                        break;
+                              }
+                              break;
+                         case NetIncomingMessageType.Data:
+                              var gameMessageType = (GameMessageTypes) im.ReadByte();
+                              switch (gameMessageType)
+                              {
+                                   case GameMessageTypes.Vector:
+                                        this.HandleVector(im);
+                                        break;
+                                   case GameMessageTypes.TileView:
+                                        this.HandleTileView(im);
+                                        break;
+                                   case  GameMessageTypes.NewGame:
+                                        this.HandleNewGame(im);
+                                        break;
+                                   case GameMessageTypes.AttackResult:
+                                        this.HandleAttackResult(im);
+                                        break;
+                                   case GameMessageTypes.PlayerStats:
+                                        this.HandlePlayerStats(im);
+                                        break;
+                              }
+                              break;
+                    }
+                    this._networkManager.Recycle(im);
+               }
+          }
+
+
+          private void HandleVector(NetIncomingMessage im)
+          {
+               var message = new VectorMessage(im);
+
+               int row = message.X;
+               int col = message.Y;
+
+               newAttack = player1.Shoot(row, col);
+               TileView tileView = player1.ItemTileView(row, col);
+               _networkManager.SendMessage(new TileViewMessage(row, col, tileView));
+               _networkManager.SendMessage(new PlayerStatsMessage(player1.Shots, player1.Hits, player1.Misses, player1.PlayerGrid.ShipsKilled));
+               _networkManager.SendMessage(new AttackResultMessage(newAttack));
+               ableToShoot = true;
+          }
+
+          private void HandleTileView(NetIncomingMessage im)
+          {
+               var message = new TileViewMessage(im);
+               int x = message.X;
+               int y = message.Y;
+               TileView tv = message.View;
+               enemyPlayer.PlayerGrid.TvAssign(x, y, tv);
+
+          }
+
+          private void HandleNewGame(NetIncomingMessage im)
+          {
+               var message = new NewGameMessage(im);
+               this.player1.Reset();
+               str = "Guess where the enemy's ships are on the grid!";
+               currentPlayer = "PLAYER " + (_playerIndex + 1) + "'S TURN";
+               enemyPlayer.Reset();
+               ableToShoot = true;
+          }
+
+          private void HandleAttackResult(NetIncomingMessage im)
+          {
+               var message = new AttackResultMessage(im);
+               AttackResult ar = new AttackResult((ResultOfAttack) 1, " ", 0, 0)
+               {
+                    Value = message.Value,
+                    Text = message.Text,
+                    Row = message.Row,
+                    Column = message.Col
+               };
+               if (_players[_otherPlayer].AllDestroyed)
+                    ar = new AttackResult(ResultOfAttack.GameOver, ar.Ship, "WIN! GAME OVER!", shotRow, shotCol);
+
+               if (Player == player1)
+                    str = "YOU ";
+               else
+                    str = "ENEMY ";
+
+               if (Player != player1 && ar.Value == ResultOfAttack.Destroyed)
+                    str += "destroyed your " + shipList1[(ShipName)ar.Ship] + "(" + ar.Ship + ")" + "!";
+               else
+                    str += ar.Text;
+
+          }
+
+          private void HandlePlayerStats(NetIncomingMessage im)
+          {
+               var message = new PlayerStatsMessage(im);
+               enemyPlayer.Shots = message.Shots;
+               enemyPlayer.Hits = message.Hits;
+               enemyPlayer.Misses = message.Misses;
+               enemyPlayer.PlayerGrid.ShipsKilled = message.ShipsKilled;
+
+          }
+
+          //======================================================================//
+          //======================================================================//
+
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           ///  D R A W   D R A W   D R A W   D R A W   D R A W   D R A W   D R A W   D R A W   D R A W   D
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           /// This is called when the game should draw itself.
-          protected override void Draw(GameTime gameTime) {
-
-
+          protected override void Draw(GameTime gameTime)
+          {
                // starts Drawing
                _spriteBatch.Begin();
 
-               //_spriteBatch.Draw(background, new Rectangle(0, 0, 900, 900), Color.SlateGray);
+               _spriteBatch.Draw(background, new Rectangle(0, 0, 900, 900), Color.SlateGray);
                //if (_managerNetwork.Active)
-               _graphics.GraphicsDevice.Clear(_color);
+               //_graphics.GraphicsDevice.Clear(_color);
 
                pbNewGame.Draw(_spriteBatch);
                pbConnect.Draw(_spriteBatch);
@@ -328,33 +516,33 @@ namespace Battleship438
                pbExit.Draw(_spriteBatch);
 
                player1.Draw(_spriteBatch);
-               //player2.Draw(_spriteBatch);
+               //enemyPlayer.Draw(_spriteBatch);
                //TODO: dynamicize
 
                _moveTestShip.Draw(_spriteBatch);
                _spriteBatch.Draw(cursor, new Vector2(currMouseState.X, currMouseState.Y), Color.White);
 
-               _spriteBatch.DrawString(motorOil, "PLAYER 1", new Vector2(vp.Width / 14, 30), Color.White);
-               _spriteBatch.DrawString(motorOil, "PLAYER 2", new Vector2(11 * vp.Width / 14 - 7, 30), Color.White);
+               _spriteBatch.DrawString(motorOil, "PLAYER", new Vector2(vp.Width / 14, 30), Color.White);
+               _spriteBatch.DrawString(motorOil, "ENEMY ", new Vector2(11 * vp.Width / 14 - 7, 30), Color.White);
 
-               _spriteBatch.DrawString(museoSans, player1.shipsLeft().ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.shipsLeft().ToString()).X, 200), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, enemyPlayer.ShipsLeft().ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(enemyPlayer.ShipsLeft().ToString()).X, 200), Color.Goldenrod);
                _spriteBatch.DrawString(museoSans, "Ships", new Vector2(vp.Width / 2 - museoSans.MeasureString("Ships").X / 2, 200), Color.Goldenrod);
-               _spriteBatch.DrawString(museoSans, player2.shipsLeft().ToString(), new Vector2(vp.Width / 2 + 50, 200), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, player1.ShipsLeft().ToString(), new Vector2(vp.Width / 2 + 50, 200), Color.Goldenrod);
 
-               _spriteBatch.DrawString(museoSans, player1.Shots.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Shots.ToString()).X, 235), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, enemyPlayer.Shots.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(enemyPlayer.Shots.ToString()).X, 235), Color.Goldenrod);
                _spriteBatch.DrawString(museoSans, "Shots", new Vector2(vp.Width / 2 - museoSans.MeasureString("Shots").X / 2, 235), Color.Goldenrod);
-               _spriteBatch.DrawString(museoSans, player2.Shots.ToString(), new Vector2(vp.Width / 2 + 50, 235), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, player1.Shots.ToString(), new Vector2(vp.Width / 2 + 50, 235), Color.Goldenrod);
 
-               _spriteBatch.DrawString(museoSans, player1.Hits.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Hits.ToString()).X, 270), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, enemyPlayer.Hits.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(enemyPlayer.Hits.ToString()).X, 270), Color.Goldenrod);
                _spriteBatch.DrawString(museoSans, " Hits ", new Vector2(vp.Width / 2 - museoSans.MeasureString(" Hits ").X / 2, 270), Color.Goldenrod);
-               _spriteBatch.DrawString(museoSans, player2.Hits.ToString(), new Vector2(vp.Width / 2 + 50, 270), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, player1.Hits.ToString(), new Vector2(vp.Width / 2 + 50, 270), Color.Goldenrod);
 
-               _spriteBatch.DrawString(museoSans, player1.Misses.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(player1.Misses.ToString()).X, 305), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, enemyPlayer.Misses.ToString(), new Vector2(vp.Width / 2 - 50 - museoSans.MeasureString(enemyPlayer.Misses.ToString()).X, 305), Color.Goldenrod);
                _spriteBatch.DrawString(museoSans, "Misses", new Vector2(vp.Width / 2 - museoSans.MeasureString("Misses").X / 2, 305), Color.Goldenrod);
-               _spriteBatch.DrawString(museoSans, player2.Misses.ToString(), new Vector2(vp.Width / 2 + 50, 305), Color.Goldenrod);
+               _spriteBatch.DrawString(museoSans, player1.Misses.ToString(), new Vector2(vp.Width / 2 + 50, 305), Color.Goldenrod);
 
                _spriteBatch.DrawString(museo, str, new Vector2(vp.Width / 2 - museo.MeasureString(str).X / 2, 360), Color.Goldenrod);
-               
+
                if (newAttack != null)
                {
                     _spriteBatch.DrawString(museo, shotRow + 1 + ", " + (shotCol + 1), new Vector2(vp.Width / 2 - museo.MeasureString(shotRow + 1 + ", " + (shotCol + 1)).X / 2, 397), Color.Goldenrod);
@@ -363,7 +551,7 @@ namespace Battleship438
                          currentPlayer = "PLAY AGAIN?";
                }
                _spriteBatch.DrawString(museo29, currentPlayer, new Vector2(vp.Width / 2 - museo29.MeasureString(currentPlayer).X / 2, 435), Color.Gold);
-               
+
                //stop drawing
                _spriteBatch.End();
 

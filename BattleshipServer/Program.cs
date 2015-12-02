@@ -1,16 +1,12 @@
-﻿// ReSharper disable once CheckNamespace
-namespace Battleship438.Server
+﻿using Battleship438Game;
+using Battleship438Game.Network;
+
+namespace Server
 {
-     using System;
-     using System.Threading;
-     using Battleship438;
-     using Battleship438.Network;
      internal class Program
      {
-          private static void Main(string[] args)
-          {
-               using (var game = new BattleshipGame(new ServerNetworkManager()))
-               {
+          private static void Main(string[] args) {
+               using (var game = new BattleshipGame()){
                     game.Run();
                }
           }

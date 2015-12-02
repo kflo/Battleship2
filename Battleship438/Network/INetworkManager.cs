@@ -1,23 +1,28 @@
 ﻿using System;
+using Battleship438Game.Network.Messages;
 using Lidgren.Network;
 
-namespace Battleship438.Network
+namespace Battleship438Game.Network
 {
-    public interface INetworkManager : IDisposable
-    {
-         bool Running { get; set; }
+     public interface INetworkManager : IDisposable
+     {
+          bool Running { get; set; }
 
-         void Connect();
+          int Connection();
 
-        NetOutgoingMessage CreateMessage();
+          void Connect();
 
-        void Disconnect();
+          NetOutgoingMessage CreateMessage();
 
-        NetIncomingMessage ReadMessage();
+          void Disconnect();
 
-        void Recycle(NetIncomingMessage im);
+          NetIncomingMessage ReadMessage();
 
-        void SendMessage(int x, int y);
-          
-    }
+          void Recycle(NetIncomingMessage im);
+
+          void SendMessage(int x, int y);
+
+          void SendMessage(IGameMessage gameMessage);
+
+     }
 }

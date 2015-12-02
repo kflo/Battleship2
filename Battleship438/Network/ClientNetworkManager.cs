@@ -1,21 +1,19 @@
-﻿using Lidgren.Network;
-using Battleship438;
-using Battleship438.Model;
+﻿using System.Net;
+using Battleship438Game.Model;
+using Battleship438Game.Network.Messages;
+using Lidgren.Network;
 
-namespace Battleship438.Network
+namespace Battleship438Game.Network
 {
      public class ClientNetworkManager : INetworkManager   {
           //=======================================================================//
-          #region Constants and Fields
 
           private bool _isDisposed;
-          public bool Running { get; set; } = false;
+          public bool Running { get; set; }
           public NetClient Client { get; private set; }
           public Player Player { get; set; }
 
-          #endregion
           //=======================================================================//
-          #region Public Methods and Operators
 
           public void Connect(){
                var config = new NetPeerConfiguration("Battleship438"){
@@ -27,18 +25,19 @@ namespace Battleship438.Network
                config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
                config.EnableMessageType(NetIncomingMessageType.ErrorMessage);
                config.EnableMessageType(NetIncomingMessageType.Error);
+               config.EnableMessageType(NetIncomingMessageType.StatusChanged);
                config.EnableMessageType(NetIncomingMessageType.Data);
-               config.EnableMessageType(NetIncomingMessageType.DebugMessage);
                config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
                this.Client = new NetClient(config);
                this.Client.Start();
                Running = true;
-               
-               var outMsg = Client.CreateMessage();
-               outMsg.Write((byte)PacketType.Login);
-               this.Client.Connect("localhost", 14241, outMsg);
+               this.Client.Connect("149.160.80.60", 14241);
           }
 
+          public int Connection(){
+               return Client.ConnectionsCount;
+          }
+          
           public NetOutgoingMessage CreateMessage(){
                return this.Client.CreateMessage();
           }
@@ -59,6 +58,8 @@ namespace Battleship438.Network
                this.Client.Recycle(im);
           }
 
+          //=======================================================================//
+
           public void SendMessage(int x, int y){
                NetOutgoingMessage outX = CreateMessage();
                NetOutgoingMessage outY = CreateMessage();
@@ -69,9 +70,16 @@ namespace Battleship438.Network
                this.Client.SendMessage(outY, NetDeliveryMethod.ReliableOrdered);
           }
 
-          #endregion
+          public void SendMessage(IGameMessage gameMessage)
+          {
+               NetOutgoingMessage om = this.Client.CreateMessage();
+               om.Write((byte)gameMessage.MessageType);
+               gameMessage.Encode(om);
+
+               this.Client.SendMessage(om, NetDeliveryMethod.ReliableUnordered);
+          }
+
           //=======================================================================//
-          #region Methods
 
           private void Dispose(bool disposing){
                if (this._isDisposed) return;
@@ -80,6 +88,5 @@ namespace Battleship438.Network
                Running = false;
                this._isDisposed = true;
           }
-          #endregion
      }
 }

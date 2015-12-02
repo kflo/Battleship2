@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 
-namespace Battleship438
+namespace Battleship438Game
 {
-     class MoveableShip
+     internal class MoveableShip
      {
           // Animation representing the player
           public Texture2D PlayerTexture;

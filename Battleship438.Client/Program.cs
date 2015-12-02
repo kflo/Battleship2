@@ -1,15 +1,16 @@
-﻿namespace Battleship438.Client
-{
-     using System;
-     using System.Threading;
-     using Battleship438;
-     using Battleship438.Network;
+﻿using System;
+using System.Threading;
+using Battleship438Game;
+using Battleship438Game.Network;
 
-     internal class Program
+namespace Client
+{
+     public static class Program
      {
-          private static void Main(string[] args) {
+          [STAThread]
+          private static void Main() {
                Thread.Sleep(1000);
-               using (var game = new BattleshipGame(new ClientNetworkManager())){
+               using (var game = new BattleshipGame()){
                     game.Run();
                }
           }

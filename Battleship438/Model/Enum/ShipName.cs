@@ -1,7 +1,6 @@
-
 using System.ComponentModel;
 
-namespace Battleship438.Model
+namespace Battleship438Game.Model.Enum
 {
      /// The names of all of the ships in the game
      public enum ShipName

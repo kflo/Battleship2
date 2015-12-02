@@ -1,106 +1,96 @@
 using System;
+using Battleship438Game.Model.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Battleship438.Model
+namespace Battleship438Game.Model
 {
-     /// The SeaGridAdapter allows for the change in a sea grid view. Whenever a ship is
-     /// presented it changes the view into a sea tile instead of a ship tile.
-     public class SeaGridAdapter : ISeaGrid
-     {
+     /// SeaGridAdapter allows for tile view change, into a sea tile instead of a ship tile.
+     public class SeaGridAdapter : ISeaGrid {
 
-          private SeaGrid _MyGrid;
+          private readonly SeaGrid _myGrid;
           public bool Cheat = false;
-          /// Create the SeaGridAdapter, with the grid, and it will allow it to be changed
-          /// <param name="grid">the grid that needs to be adapted</param>
-          /// 
+
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
           public SeaGridAdapter(SeaGrid grid) {
-               _MyGrid = grid;
-               _MyGrid.Changed += originalSeaGridChanged;
+               _myGrid = grid;
+               _myGrid.Changed += OriginalSeaGridChanged;
           }
 
-          /// Indicates that the grid has been changed
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+          public int Width => _myGrid.Width;
+
+          public int Height => _myGrid.Height;
+
+          public Rectangle Rect => _myGrid.Rect;
+
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
           public event EventHandler<TileEventArgs> Changed;
 
-          /// MyGrid_Changed causes the grid to be redrawn by raising a changed event
-          private void adapterChanged(object sender, TileEventArgs e) {
-               if (Changed != null)
-                    Changed(this, e);
+          private void AdapterChanged(object sender, TileEventArgs e) {
+               Changed?.Invoke(this, e);
           }
 
-          private void originalSeaGridChanged(object sender, TileEventArgs e) {
-               adapterChanged(this, e);
+          private void OriginalSeaGridChanged(object sender, TileEventArgs e) {
+               AdapterChanged(this, e);
           }
 
-
-          /*public void shipTexturize(Texture2D shipTex) {
-               _MyGrid.shipTexturize(shipTex);
-          }*/
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           /// Changes the discovery grid. Where there is a ship we will sea water
-          /// <returns>a tile, either what it actually is, or if it was a ship then return a sea tile</returns>
-          public TileView TileView(int x, int y)
-          {
-               TileView result = _MyGrid.TileView(x, y);
-               if (result == Model.TileView.Ship)
+          public TileView TileView(int x, int y){
+               TileView result = _myGrid.TileView(x, y);
+               if (result == Enum.TileView.Ship)
                     if (Cheat == false)
-                         return Model.TileView.Sea;
+                         return Enum.TileView.Sea;
                return result;
           }
 
-
-
-          /// Get the width of a tile
-          public int Width  {
-               get { return _MyGrid.Width; }
+          public AttackResult HitTile(int row, int col){
+               return _myGrid.HitTile(row, col);
           }
 
-          /// Get the height of the tile
-          public int Height {
-               get { return _MyGrid.Height; }
-          }
-
-
-          public Rectangle Rect{
-               get { return _MyGrid.Rect; }
-               //set { rect = value; }
-          }
-
-          /// HitTile calls oppon _MyGrid to hit a tile at the row, col <returns>The result from hitting that tile</returns>
-          public AttackResult HitTile(int row, int col) {
-               return _MyGrid.HitTile(row, col);
-          }
-
-          /*public void texturize(Texture2D tex) {
-               _MyGrid.texturize(tex);
-          }*/
-          public void Initialize(){
-               _MyGrid.Initialize();
-          }
-
-          public void Update()
+          public void TvAssign(int row, int col, TileView tileView)
           {
-               _MyGrid.Update();
+               _myGrid.TvAssign(row, col, tileView);
+          }
+
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+          public void Initialize(){
+               _myGrid.Initialize();
+          }
+
+          public void Update(){
+               _myGrid.Update();
           }
 
           public void Draw(SpriteBatch spriteBatch){
                for (int i = 0; i < Width; i++){
                     for (int j = 0; j < Height; j++){
                          switch (TileView(i, j)){
-                              case Model.TileView.Sea:
-                                   spriteBatch.Draw(_MyGrid.Water, _MyGrid.TileRect(i, j), Color.White);
+                              case Enum.TileView.Sea:
+                                   spriteBatch.Draw(_myGrid.Water, _myGrid.TileRect(i, j), Color.White);
                                    break;
-                              case Model.TileView.Miss:
-                                   spriteBatch.Draw(_MyGrid.White, _MyGrid.TileRect(i, j), Color.White);
+                              case Enum.TileView.Miss:
+                                   spriteBatch.Draw(_myGrid.White, _myGrid.TileRect(i, j), Color.White);
                                    break;
-                              case Model.TileView.Ship:
-                                   spriteBatch.Draw(_MyGrid.ShipTex, _MyGrid.TileRect(i, j), Color.White);
+                              case Enum.TileView.Ship:
+                                   spriteBatch.Draw(_myGrid.ShipTex, _myGrid.TileRect(i, j), Color.White);
                                    break;
-                              case Model.TileView.Hit:
-                                   spriteBatch.Draw(_MyGrid.Red, _MyGrid.TileRect(i, j), Color.White);
+                              case Enum.TileView.Hit:
+                                   spriteBatch.Draw(_myGrid.Red, _myGrid.TileRect(i, j), Color.White);
                                    break;
                               default:
-                                   spriteBatch.Draw(_MyGrid.Water, _MyGrid.TileRect(i, j), Color.White);
+                                   spriteBatch.Draw(_myGrid.Water, _myGrid.TileRect(i, j), Color.White);
                                    break;
                          }
                     }

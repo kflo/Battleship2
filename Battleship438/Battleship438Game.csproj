@@ -8,7 +8,7 @@
     <ProjectGuid>{07831CEF-264A-4002-989F-1CAA789FA69A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Battleship438</RootNamespace>
+    <RootNamespace>Battleship438Game</RootNamespace>
     <AssemblyName>Battleship438</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
@@ -33,15 +33,15 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Windows\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -57,26 +57,35 @@
     <ApplicationIcon>battleship438.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>Battleship438Game.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BattleshipGame.cs" />
+    <Compile Include="Model\TileEventArgs.cs" />
     <Compile Include="Network\ClientNetworkManager.cs" />
     <Compile Include="Network\Data.cs" />
     <Compile Include="Network\INetworkManager.cs" />
+    <Compile Include="Network\Messages\playerStatsMessage.cs" />
+    <Compile Include="Network\Messages\GameMessageTypes.cs" />
+    <Compile Include="Network\Messages\IGameMessage.cs" />
+    <Compile Include="Network\Messages\extensionMethods.cs" />
+    <Compile Include="Network\Messages\AbleToShootMessage.cs" />
+    <Compile Include="Network\Messages\TileViewMessage.cs" />
+    <Compile Include="Network\Messages\NewGameMessage.cs" />
+    <Compile Include="Network\Messages\AttackResultMessage.cs" />
+    <Compile Include="Network\Messages\VectorMessage.cs" />
     <Compile Include="Network\ServerNetworkManager.cs" />
     <Compile Include="Model\AttackResult.cs" />
-    <Compile Include="Model\Direction.cs" />
+    <Compile Include="Model\Enum\Direction.cs" />
     <Compile Include="Model\ISeaGrid.cs" />
     <Compile Include="Model\Player.cs" />
-    <Compile Include="Model\ResultOfAttack.cs" />
+    <Compile Include="Model\Enum\ResultOfAttack.cs" />
     <Compile Include="Model\SeaGrid.cs" />
     <Compile Include="Model\SeaGridAdapter.cs" />
     <Compile Include="Model\Ship.cs" />
-    <Compile Include="Model\ShipName.cs" />
+    <Compile Include="Model\Enum\ShipName.cs" />
     <Compile Include="Model\Tile.cs" />
-    <Compile Include="Model\TileView.cs" />
+    <Compile Include="Model\Enum\TileView.cs" />
     <Compile Include="MoveableShip.cs" />
     <Compile Include="PB1.cs" />
     <Compile Include="Program.cs" />
@@ -84,22 +93,28 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Lidgren.Network, Version=3.5.0.793, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="MonoGame.Framework">
+    <Reference Include="MonoGame.Framework, Version=3.5.0.793, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="battleship438.ico" />
     <Content Include="Content\Graphics\background.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Graphics\background0.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Graphics\connect.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Graphics\cursor50.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Graphics\disconnect.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Graphics\earth.png" />
@@ -116,6 +131,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Graphics\hide.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Graphics\host.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Graphics\miniBS.png" />
@@ -140,7 +158,7 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="App.config" />
     <Content Include="Content\Graphics\player.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

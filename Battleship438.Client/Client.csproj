@@ -7,8 +7,8 @@
     <ProjectGuid>{4EF4A955-EB1F-4FB0-A711-99AE0A8D75D7}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Battleship438.Client</RootNamespace>
-    <AssemblyName>Battleship438.Client</AssemblyName>
+    <RootNamespace>Client</RootNamespace>
+    <AssemblyName>Client</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,9 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Battleship438.Client.Program</StartupObject>
+    <StartupObject>Client.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Lidgren.Network, Version=3.5.0.793, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="MonoGame.Framework, Version=3.5.0.793, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,9 +49,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Battleship438\Battleship438.Game.csproj">
+    <ProjectReference Include="..\Battleship438\Battleship438Game.csproj">
       <Project>{07831CEF-264A-4002-989F-1CAA789FA69A}</Project>
-      <Name>Battleship438.Game</Name>
+      <Name>Battleship438Game</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

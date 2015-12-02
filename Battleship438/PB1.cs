@@ -1,71 +1,61 @@
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
-
-namespace Battleship438
+namespace Battleship438Game
 {
-     public partial class PB1
-     {
-          private Texture2D texture;
-          private string asset;
-          private Rectangle rect;
-          private bool clickDone = false;
+     public partial class PB1 {
 
-          public Texture2D Texture {
-               get   {return texture;}
-               set   {texture = value;}     
-          }
+          private Rectangle _rect;
+          private bool _clickDone;
 
-          public string Asset {
-               get { return asset; }
-               set { asset = value; }
-          }
-
-          public event EventHandler ButtonDown;
-          public event EventHandler ButtonUp;
+          public Texture2D Texture { get; set; }
+          public string Asset { get; set; }
 
           public PB1(string asset) {
                this.Asset = asset;
           }
 
-          private void pbDown(object sender, EventArgs e) {
+          //=======================================================================//
+          //=======================================================================//
+
+          public event EventHandler ButtonDown;
+          public event EventHandler ButtonUp;
+
+          private void pbDown(object sender, EventArgs e){
                //bubble the event up to the parent
-               if (this.ButtonDown != null)
-                    this.ButtonDown(this, e);
-          }
-          private void pbUp(object sender, EventArgs e)
-          {
-               //bubble the event up to the parent
-               if (this.ButtonUp != null)
-                    this.ButtonUp(this, e);
+               this.ButtonDown?.Invoke(this, e);
           }
 
-          public void LoadContent(ContentManager content, Rectangle window)
-          {
+          private void pbUp(object sender, EventArgs e){
+               //bubble the event up to the parent
+               this.ButtonUp?.Invoke(this, e);
+          }
+
+          //=======================================================================//
+          //=======================================================================//
+
+          public void LoadContent(ContentManager content, Rectangle window){
                Texture = content.Load<Texture2D>(Asset);
-               rect = new Rectangle(window.Width / 2 - Texture.Width / 2, window.Height / 2 - Texture.Height / 2, Texture.Width, Texture.Height);
+               _rect = new Rectangle(window.Width / 2 - Texture.Width / 2, window.Height / 2 - Texture.Height / 2, Texture.Width, Texture.Height);
 
           }
-
-          public void Update()
-          {
-               if (rect.Contains(new Point(Mouse.GetState().X,Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && clickDone == false)
-               {
+          
+          public void Update(){
+               if (_rect.Contains(new Point(Mouse.GetState().X,Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Pressed && _clickDone == false){
                     pbDown(this, EventArgs.Empty);
-                    clickDone = true;
+                    _clickDone = true;
                }
-               if (Mouse.GetState().LeftButton == ButtonState.Released && clickDone == true)
-               {
+               if (Mouse.GetState().LeftButton == ButtonState.Released && _clickDone){
                     pbUp(this, EventArgs.Empty);
-                    clickDone = false;
+                    _clickDone = false;
                }
           }
 
           public void Draw(SpriteBatch spriteBatch) {
-               spriteBatch.Draw(Texture, rect, Color.White);
+               spriteBatch.Draw(Texture, _rect, Color.White);
           }
          
      }

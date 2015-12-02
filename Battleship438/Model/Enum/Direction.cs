@@ -1,4 +1,4 @@
-namespace Battleship438.Model
+namespace Battleship438Game.Model.Enum
 {
      /// The direction the ship can be oriented.
      public enum Direction

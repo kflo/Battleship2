@@ -1,103 +1,82 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Battleship438Game.Model.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-///using Microsoft.Xna.Framework.Input;
 
-namespace Battleship438.Model
+namespace Battleship438Game.Model
 {
-     /// Player has its own _PlayerGrid, and can see an _EnemyGrid, it can also check if
-     /// all ships are deployed and if all ships are detroyed. A Player can also attach.
+     /// Player has its own _PlayerGrid, and can see an _EnemyGrid; it can also check if all ships are deployed/detroyed.
      public class Player : IEnumerable<Ship>
      {
           protected static Random _Random = new Random();
-
-          private Dictionary<ShipName, Ship> _Ships = new Dictionary<ShipName, Ship>();
-          private SeaGrid _playerGrid;
-          private SeaGridAdapter _enemyGrid;
+          private readonly Dictionary<ShipName, Ship> _ships;
           private Texture2D Water, Red, White, ShipTex;
+          public TileView Tv { get; set; }
 
-          private int _shots;
-          private int _hits;
-          private int _misses;
 
-          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-   
           public Player(Dictionary<ShipName, Ship> shipList, Vector2 gridVector, Texture2D water, Texture2D red, Texture2D white, Texture2D shipTex) {
                Water = water;
                Red = red;
                White = white;
                ShipTex = shipTex;
-               _Ships = shipList;
-               _playerGrid = new SeaGrid(_Ships, gridVector, water, red, white, shipTex);
-
-               //RandomizeDeployment();
+               _ships = shipList;
+               PlayerGrid = new SeaGrid(_ships, gridVector, water, red, white, shipTex);
           }
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
      
-          /// Sets the grid of the enemy player
-          /// <value>The enemy's sea grid</value>
+          /// Sets the grid of the enemy player 
           public SeaGridAdapter Enemy {
-               set { _enemyGrid = value; }
-
+               set { EnemyGrid = value; }
           }
 
           /// The EnemyGrid is a ISeaGrid because you shouldn't be allowed to see the enemies ships
-          public SeaGridAdapter EnemyGrid {
-               get { return _enemyGrid; }
-          }
+          public SeaGridAdapter EnemyGrid { get; private set; }
 
           /// The PlayerGrid is just a normal SeaGrid where the players ships can be deployed and seen
-          public SeaGrid PlayerGrid {
-               get { return _playerGrid; }
-          }
+          public SeaGrid PlayerGrid { get; }
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           /// returns true if all ships are deployed
-          public bool ReadyToDeploy {
-               get { return _playerGrid.AllDeployed; }
-          }
+          public bool ReadyToDeploy => PlayerGrid.AllDeployed;
 
-          public bool allDestroyed {
-               get { return _playerGrid.ShipsKilled == 5; }
-          }
+          public bool AllDestroyed => PlayerGrid.ShipsKilled == 5;
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-          public int Shots { get { return _shots; } }
+          public int Shots { get;  set; }
 
-          public int Hits { get { return _hits; } }
+          public int Hits { get;  set; }
 
-          public int Misses { get { return _misses; } }
+          public int Misses { get;  set; }
 
-          public int shipsLeft() { return _Ships.Count - PlayerGrid.ShipsKilled; }
+          public int ShipsLeft() { return _ships.Count - PlayerGrid.ShipsKilled; }
 
           public int Score {
                get {
-                    if (allDestroyed)
+                    if (AllDestroyed)
                          return 0;
                     else
                          return (Hits * 12) - Shots - (PlayerGrid.ShipsKilled * 20);
                }
           }
-     
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           /// Makes it possible to enumerate over the ships the player has.
-          /// <returns>A Ship enumerator</returns>
           public IEnumerator<Ship> GetShipEnumerator()     {
-               Ship[] result = new Ship[_Ships.Values.Count + 1];
-               _Ships.Values.CopyTo(result, 0);
+               Ship[] result = new Ship[_ships.Values.Count + 1];
+               _ships.Values.CopyTo(result, 0);
                List<Ship> lst = new List<Ship>();
                lst.AddRange(result);
 
@@ -109,10 +88,9 @@ namespace Battleship438.Model
           }
 
           /// Makes it possible to enumerate over the ships the player has.
-          /// <returns>A Ship enumerator</returns>
           public IEnumerator GetEnumerator()     {
-               Ship[] result = new Ship[_Ships.Values.Count + 1];
-               _Ships.Values.CopyTo(result, 0);
+               Ship[] result = new Ship[_ships.Values.Count + 1];
+               _ships.Values.CopyTo(result, 0);
                List<Ship> lst = new List<Ship>();
                lst.AddRange(result);
 
@@ -125,47 +103,62 @@ namespace Battleship438.Model
           /// Shoot at a given row/column
           internal AttackResult Shoot(int row, int col) {
                AttackResult result = default(AttackResult);
-               result = EnemyGrid.HitTile(row, col);
+               result = PlayerGrid.HitTile(row, col);
+               //result = EnemyGrid.HitTile(row, col);
 
                switch (result.Value) {
                     case ResultOfAttack.Destroyed:
+                         Tv = TileView.Hit;
+                         break;
                     case ResultOfAttack.Hit:
-                         _hits += 1;
-                         _shots += 1;
+                         Hits += 1;
+                         Shots += 1;
+                         Tv = TileView.Hit;
                          break;
                     case ResultOfAttack.Miss:
-                         _misses += 1;
-                         _shots += 1;
+                         Misses += 1;
+                         Shots += 1;
+                         Tv = TileView.Miss;
                          break;
+                    case ResultOfAttack.ShotAlready:
+                         break;
+                    case ResultOfAttack.GameOver:
+                         break;
+                    case ResultOfAttack.None:
+                         break;
+                    default:
+                         throw new ArgumentOutOfRangeException();
                }
                return result;
           }
 
-          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-          public void Reset(Texture2D tex)
-          {
-               PlayerGrid.Reset();
-               PlayerGrid.Initialize();
-               _shots = 0;
-               _hits = 0;
-               _misses = 0;
+          public TileView ItemTileView(int x, int y){
+               return PlayerGrid.TileView(x, y);
           }
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          public void Reset()
+          {
+               PlayerGrid.Reset();
+               PlayerGrid.Initialize();
+               Shots = 0;
+               Hits = 0;
+               Misses = 0;
+          }
 
+          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+          /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           public void Update()
           {
                //PlayerGrid.Update();
                EnemyGrid.Update();
           }
 
-          public void Draw(SpriteBatch spriteBatch){
-               _playerGrid.Draw(spriteBatch);
-               _enemyGrid.Draw(spriteBatch);
+          public void Draw(SpriteBatch spriteBatch)
+          {
+               PlayerGrid.Draw(spriteBatch);
+               EnemyGrid.Draw(spriteBatch);
           }
-
      }
 }
