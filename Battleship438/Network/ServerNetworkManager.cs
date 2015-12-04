@@ -16,7 +16,7 @@ namespace Battleship438Game.Network
 
           public void Connect(){
                var config = new NetPeerConfiguration("Battleship438"){
-                    Port = 14241,
+                    Port = 14241, 
                     // SimulatedMinimumLatency = 0.2f, 
                     // SimulatedLoss = 0.1f 
                };
