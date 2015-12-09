@@ -23,7 +23,7 @@ namespace Battleship438Game.Model
           // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-          public string Name => _shipName.ToString();
+          public ShipName Name => _shipName;
 
           public int Size { get; }
 

@@ -17,8 +17,6 @@ namespace Battleship438Game.Network
           public void Connect(){
                var config = new NetPeerConfiguration("Battleship438"){
                     Port = 14241, 
-                    // SimulatedMinimumLatency = 0.2f, 
-                    // SimulatedLoss = 0.1f 
                };
                config.EnableMessageType(NetIncomingMessageType.WarningMessage);
                config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
@@ -59,20 +57,13 @@ namespace Battleship438Game.Network
 
           //=======================================================================//
 
-          public void SendMessage(int x, int y){
-               NetOutgoingMessage om = this.Server.CreateMessage();
-               om.Write(x);
-               om.Write(y);
-               this.Server.SendToAll(om, NetDeliveryMethod.ReliableUnordered);
-          }
-
           public void SendMessage(IGameMessage gameMessage)
           {
                NetOutgoingMessage om = this.Server.CreateMessage();
                om.Write((byte)gameMessage.MessageType);
                gameMessage.Encode(om);
 
-               this.Server.SendToAll(om, NetDeliveryMethod.ReliableUnordered);
+               this.Server.SendToAll(om, NetDeliveryMethod.ReliableOrdered);
           }
 
           //=======================================================================//

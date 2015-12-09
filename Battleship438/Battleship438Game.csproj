@@ -65,10 +65,10 @@
     <Compile Include="Network\ClientNetworkManager.cs" />
     <Compile Include="Network\Data.cs" />
     <Compile Include="Network\INetworkManager.cs" />
+    <Compile Include="Network\Messages\GameOverMessage.cs" />
     <Compile Include="Network\Messages\playerStatsMessage.cs" />
     <Compile Include="Network\Messages\GameMessageTypes.cs" />
     <Compile Include="Network\Messages\IGameMessage.cs" />
-    <Compile Include="Network\Messages\extensionMethods.cs" />
     <Compile Include="Network\Messages\AbleToShootMessage.cs" />
     <Compile Include="Network\Messages\TileViewMessage.cs" />
     <Compile Include="Network\Messages\NewGameMessage.cs" />

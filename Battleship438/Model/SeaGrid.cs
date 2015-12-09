@@ -54,7 +54,7 @@ namespace Battleship438Game.Model
           }
 
           private void Randomize(ref Direction heading, ref int row, ref int col, Ship ship)     {
-               _rand = new Random(System.DateTime.Now.Millisecond);
+               _rand = new Random(DateTime.Now.Millisecond);
                int dir;
                int dRow;
                int dCol;
@@ -170,7 +170,6 @@ namespace Battleship438Game.Model
                AddShip(row, col, direction, shipToMove);
           }
 
-
           /// AddShip add a ship to the SeaGrid
           private void AddShip(int row, int col, Direction direction, Ship ship)     {
                try {
@@ -221,18 +220,14 @@ namespace Battleship438Game.Model
                if (_gameTiles[row, col].Ship == null) {
                     return new AttackResult(ResultOfAttack.Miss, "missed!", row, col);
                }
-               else if (_gameTiles[row, col].Ship.IsDestroyed)
-               {
+               if (_gameTiles[row, col].Ship.IsDestroyed){
                     ShipsKilled += 1;
-                    return new AttackResult(ResultOfAttack.Destroyed, _gameTiles[row, col].Ship.Size, "destroyed the enemy's " + _gameTiles[row, col].Ship.Name + "(" +
-                         _gameTiles[row, col].Ship.Size + ")" + "!", row, col);
+                    return new AttackResult(ResultOfAttack.Destroyed, _gameTiles[row, col].Ship.Name, "destroyed the enemy's " + _gameTiles[row, col].Ship.Name + "(" + _gameTiles[row, col].Ship.Size + ")" + "!", row, col);
                }
-               else
-                    return new AttackResult(ResultOfAttack.Hit, _gameTiles[row, col].Ship.Size, "hit something!", row, col);
+               return new AttackResult(ResultOfAttack.Hit, _gameTiles[row, col].Ship.Name, "hit something!", row, col);
           }
 
-          public void TvAssign(int row, int col, TileView tileView)
-          {
+          public void TvAssign(int row, int col, TileView tileView){
                _gameTiles[row,col].TakeView(tileView);
           }
           
@@ -245,7 +240,6 @@ namespace Battleship438Game.Model
                          _gameTiles[i, j].Update();
                     }
                }
-
           }
 
           public void Draw(SpriteBatch spriteBatch) {  

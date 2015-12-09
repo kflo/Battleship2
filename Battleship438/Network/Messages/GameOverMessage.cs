@@ -4,29 +4,29 @@ using Microsoft.Xna.Framework;
 
 namespace Battleship438Game.Network.Messages
 {
-     public class AbleToShootMessage : IGameMessage
+     public class GameOverMessage : IGameMessage
      {
 
-          private bool _turn;
+          private string _str;
 
-          public AbleToShootMessage(NetIncomingMessage im){
+          public GameOverMessage(NetIncomingMessage im){
                this.Decode(im);
           }
 
-          public AbleToShootMessage()
+          public GameOverMessage()
           {
           }
 
-          public GameMessageTypes MessageType => GameMessageTypes.AbleToShoot;
+          public GameMessageTypes MessageType => GameMessageTypes.GameOver;
 
           public void Decode(NetIncomingMessage im)
           {
-               _turn = im.ReadBoolean();
+               _str = im.ReadString();
           }
 
           public void Encode(NetOutgoingMessage om)
           {
-               om.Write(_turn);
+               om.Write(_str);
           }
 
      }

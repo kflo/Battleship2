@@ -9,18 +9,16 @@ namespace Battleship438Game.Network
           bool Running { get; set; }
 
           int Connection();
-
+          
           void Connect();
 
-          NetOutgoingMessage CreateMessage();
-
           void Disconnect();
+
+          NetOutgoingMessage CreateMessage();
 
           NetIncomingMessage ReadMessage();
 
           void Recycle(NetIncomingMessage im);
-
-          void SendMessage(int x, int y);
 
           void SendMessage(IGameMessage gameMessage);
 

@@ -48,7 +48,7 @@ namespace Battleship438Game
                     pbDown(this, EventArgs.Empty);
                     _clickDone = true;
                }
-               if (Mouse.GetState().LeftButton == ButtonState.Released && _clickDone){
+               if (_rect.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y)) && Mouse.GetState().LeftButton == ButtonState.Released && _clickDone){
                     pbUp(this, EventArgs.Empty);
                     _clickDone = false;
                }

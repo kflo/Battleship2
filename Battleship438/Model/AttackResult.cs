@@ -4,7 +4,7 @@ namespace Battleship438Game.Model
 {
      public class AttackResult {
           public ResultOfAttack Value { get; set; }
-          public int Ship { get; }
+          public ShipName Ship { get; }
           public string Text { get; set; }
           public int Row { get; set; }
           public int Column { get; set; }
@@ -17,7 +17,7 @@ namespace Battleship438Game.Model
                Column = column;
           }
 
-          public AttackResult(ResultOfAttack value, int ship, string text, int row, int column) : this(value, text, row, column) {
+          public AttackResult(ResultOfAttack value, ShipName ship, string text, int row, int column) : this(value, text, row, column) {
                Ship = ship;
           }
 

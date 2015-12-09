@@ -11,8 +11,10 @@ namespace Battleship438Game.Network.Messages
 
         AttackResult, 
 
-        AbleToShoot,
+        AbleToShoot,  // not used
 
-          PlayerStats
+        PlayerStats,
+
+        GameOver
      }
 }

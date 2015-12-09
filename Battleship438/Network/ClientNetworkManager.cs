@@ -31,7 +31,7 @@ namespace Battleship438Game.Network
                this.Client = new NetClient(config);
                this.Client.Start();
                Running = true;
-               this.Client.Connect("149.160.80.60", 14241);
+               this.Client.Connect("localhost", 14241);
           }
 
           public int Connection(){
@@ -60,23 +60,13 @@ namespace Battleship438Game.Network
 
           //=======================================================================//
 
-          public void SendMessage(int x, int y){
-               NetOutgoingMessage outX = CreateMessage();
-               NetOutgoingMessage outY = CreateMessage();
-               //Vector2 target = new Vector2(x,y);
-               outX.Write(x);
-               this.Client.SendMessage(outX, NetDeliveryMethod.ReliableOrdered);
-               outY.Write(y);
-               this.Client.SendMessage(outY, NetDeliveryMethod.ReliableOrdered);
-          }
-
           public void SendMessage(IGameMessage gameMessage)
           {
                NetOutgoingMessage om = this.Client.CreateMessage();
                om.Write((byte)gameMessage.MessageType);
                gameMessage.Encode(om);
 
-               this.Client.SendMessage(om, NetDeliveryMethod.ReliableUnordered);
+               this.Client.SendMessage(om, NetDeliveryMethod.ReliableOrdered);
           }
 
           //=======================================================================//

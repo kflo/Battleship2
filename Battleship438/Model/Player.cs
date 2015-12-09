@@ -12,7 +12,6 @@ namespace Battleship438Game.Model
      {
           protected static Random _Random = new Random();
           private readonly Dictionary<ShipName, Ship> _ships;
-          private Texture2D Water, Red, White, ShipTex;
           public TileView Tv { get; set; }
 
 
@@ -20,10 +19,6 @@ namespace Battleship438Game.Model
           // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           public Player(Dictionary<ShipName, Ship> shipList, Vector2 gridVector, Texture2D water, Texture2D red, Texture2D white, Texture2D shipTex) {
-               Water = water;
-               Red = red;
-               White = white;
-               ShipTex = shipTex;
                _ships = shipList;
                PlayerGrid = new SeaGrid(_ships, gridVector, water, red, white, shipTex);
           }
@@ -36,7 +31,7 @@ namespace Battleship438Game.Model
                set { EnemyGrid = value; }
           }
 
-          /// The EnemyGrid is a ISeaGrid because you shouldn't be allowed to see the enemies ships
+          /// The EnemyGrid is a SeaGridAdapter because you shouldn't be allowed to see the enemies ships
           public SeaGridAdapter EnemyGrid { get; private set; }
 
           /// The PlayerGrid is just a normal SeaGrid where the players ships can be deployed and seen
@@ -48,7 +43,7 @@ namespace Battleship438Game.Model
           /// returns true if all ships are deployed
           public bool ReadyToDeploy => PlayerGrid.AllDeployed;
 
-          public bool AllDestroyed => PlayerGrid.ShipsKilled == 5;
+          public bool AllDestroyed => PlayerGrid.ShipsKilled == 2;
 
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
