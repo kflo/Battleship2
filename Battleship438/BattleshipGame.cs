@@ -22,7 +22,7 @@ namespace Battleship438Game
           private Dictionary<ShipName, Ship> shipList1, shipList2;
           private PB1 pbNewGame, pbExit, pbConnect, pbViewHide;
           private Rectangle vp;
-          private SeaGridAdapter clicker;
+          //private SeaGridAdapter clicker;
           // PLAYERS
           private readonly Player[] _players = new Player[3];
           private int _playerIndex, _otherPlayer;
@@ -105,6 +105,10 @@ namespace Battleship438Game
                     {ShipName.TugBoat, new Ship(ShipName.TugBoat)}
                };
 
+               this.Window.Position = new Point(500, 500);
+               if (IsHost)
+                    this.Window.Position = new Point(0, 0);
+
                _moveTestShip = new MoveableShip();
                player1Grid = new Vector2(vp.Width / 14, 60);
                enemyGrid = new Vector2(8 * vp.Width / 13, 60);
@@ -149,8 +153,7 @@ namespace Battleship438Game
 
                player1 = new Player(shipList1, player1Grid, water, red, white, ship);
                enemyPlayer = new Player(shipList2, enemyGrid, water, red, white, ship);
-               //TODO: initialize only local player...
-
+               
                AddDeployedPlayer(player1);
                AddDeployedPlayer(enemyPlayer);
 
@@ -185,7 +188,7 @@ namespace Battleship438Game
           /// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
           private void SeaGridChanged(object sender, TileEventArgs e){
-               clicker = (SeaGridAdapter)sender;
+               //clicker = (SeaGridAdapter)sender;
                shotRow = e.X;
                shotCol = e.Y;
           }
@@ -233,6 +236,7 @@ namespace Battleship438Game
                     pbViewHide.Asset = "Graphics\\view";
                     pbViewHide.LoadContent(Content, new Rectangle(0, 0, vp.Width, 6 * vp.Height / 12));
                     player1.EnemyGrid.Cheat = true;
+                    str = "This easter egg cheat isn't working properly! Sorry!";
                }
                else if (sender.Equals(pbNewGame)){
                     pbNewGame.Texture = Content.Load<Texture2D>("Graphics\\randomize");
@@ -367,11 +371,11 @@ namespace Battleship438Game
                                    case  GameMessageTypes.NewGame:
                                         this.HandleNewGame(im);
                                         break;
-                                   case GameMessageTypes.AttackResult:
-                                        this.HandleAttackResult(im);
-                                        break;
                                    case GameMessageTypes.PlayerStats:
                                         this.HandlePlayerStats(im);
+                                        break;
+                                   case GameMessageTypes.AttackResult:
+                                        this.HandleAttackResult(im);
                                         break;
                                    case GameMessageTypes.GameOver:
                                         this.HandleGameOver();
